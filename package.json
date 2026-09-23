@@ -1,0 +1,42 @@
+{
+  "name": "sih26",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "demo": "vite --mode demo",
+    "build": "tsc -b && vite build",
+    "db:seed:generate": "node scripts/generate-supabase-seed.mjs",
+    "lint": "oxlint",
+    "test:browser": "node scripts/verify-pages.mjs",
+    "test:public-enquiry": "node scripts/verify-public-enquiry.mjs",
+    "test:demo-login": "node scripts/verify-demo-login.mjs",
+    "test:roles": "node scripts/verify-role-access.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "@xyflow/react": "^12.11.6",
+    "@zxing/browser": "^0.2.1",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.43.0",
+    "maplibre-gl": "^6.10.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "playwright-core": "^1.63.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
+  }
+}

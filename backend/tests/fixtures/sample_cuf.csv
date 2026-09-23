@@ -1,0 +1,5 @@
+Project ID,Reporting Month,Approved Cost,Revised Cost,Expenditure,Physical Progress,Planned Progress,Original Completion Date,Revised Completion Date,Milestones Total,Milestones Completed,Land Acquisition Progress,Clearance Status,Contract Status,Issues,Remarks
+PRJ-001,15/05/2026,"1,000","1,120",610,61,70,31/12/2026,31/03/2027,10,6,94,environment:approved;forest:pending,Active,Utility relocation;land handover,Recovery plan requested
+PRJ-002,May 2026,800,850,400,120,75,2026-11-30,2027-02-28,8,5,82,environment:approved,Ongoing,Contractor mobilization,Invalid percentage demonstration
+PRJ-001,01/05/2026,1000,1120,610,61,70,2026-12-31,2027-03-31,10,6,94,environment:approved,Active,,Duplicate month demonstration
+UNKNOWN-9,2026-05-01,500,500,100,20,25,2027-06-30,2027-06-30,4,1,50,environment:pending,Active,Awaiting clearance,Unknown project demonstration
