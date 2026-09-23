@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Deterministic Risk Calculations
+// DRISHTI — Deterministic Risk Calculations
 //
 // PROTOTYPE DEMONSTRATION FORMULA — Not a Production Risk Model.
 // All scores are computed transparently from project data using weighted

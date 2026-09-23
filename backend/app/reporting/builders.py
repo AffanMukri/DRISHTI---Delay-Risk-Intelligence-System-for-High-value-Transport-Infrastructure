@@ -56,7 +56,7 @@ def _footer(canvas: Any, document: Any) -> None:
     canvas.line(18 * mm, 13 * mm, document.pagesize[0] - 18 * mm, 13 * mm)
     canvas.setFont("Helvetica", 7)
     canvas.setFillColor(colors.HexColor("#64748B"))
-    canvas.drawString(18 * mm, 8 * mm, "DHRISTI - generated from authenticated project monitoring records")
+    canvas.drawString(18 * mm, 8 * mm, "DRISHTI - generated from authenticated project monitoring records")
     canvas.drawRightString(document.pagesize[0] - 18 * mm, 8 * mm, f"Page {canvas.getPageNumber()}")
     canvas.restoreState()
 
@@ -71,7 +71,7 @@ def build_pdf(report: dict[str, Any]) -> bytes:
         topMargin=14 * mm,
         bottomMargin=18 * mm,
         title=report["title"],
-        author="DHRISTI",
+        author="DRISHTI",
         subject=f"{report['title']} for {report['reporting_month']:%B %Y}",
     )
     styles = getSampleStyleSheet()

@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Project Insights & Strategic Heuristics Page
+// DRISHTI — Project Insights & Strategic Heuristics Page
 // Systemic Patterns, Root-Cause Synthesis & Policy Recommendations
 // =============================================================================
 

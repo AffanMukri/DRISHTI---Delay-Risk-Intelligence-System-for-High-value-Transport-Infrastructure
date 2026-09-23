@@ -229,7 +229,7 @@ class FakeReportService:
         return GeneratedReport(
             report_id=REPORT_ID,
             content=b"%PDF-1.4\n%%EOF",
-            file_name="dhristi-monthly-flash.pdf",
+            file_name="drishti-monthly-flash.pdf",
             media_type="application/pdf",
             data_as_of=date(2026, 9, 30),
             checksum_sha256="a" * 64,
@@ -248,6 +248,6 @@ def test_report_endpoint_returns_a_real_attachment_with_trace_headers() -> None:
         })
     assert response.status_code == 200
     assert response.content.startswith(b"%PDF")
-    assert response.headers["content-disposition"].endswith('"dhristi-monthly-flash.pdf"')
+    assert response.headers["content-disposition"].endswith('"drishti-monthly-flash.pdf"')
     assert response.headers["x-report-id"] == str(REPORT_ID)
     assert response.headers["x-data-as-of"] == "2026-09-30"

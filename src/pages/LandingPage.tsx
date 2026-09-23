@@ -110,10 +110,10 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
     <div className="landing-page min-h-screen text-slate-900">
       <header className="landing-header" aria-label="Public website header">
         <div className="landing-container flex h-[76px] items-center justify-between gap-6">
-          <a href="#top" className="flex items-center gap-3" aria-label="DHRISTI home">
+          <a href="#top" className="flex items-center gap-3" aria-label="DRISHTI home">
             <span className="landing-brand-mark">D</span>
             <span>
-              <span className="block text-[15px] leading-none font-extrabold tracking-[0.12em] text-navy-900">DHRISTI</span>
+              <span className="block text-[15px] leading-none font-extrabold tracking-[0.12em] text-navy-900">DRISHTI</span>
               <span className="hidden sm:block text-[9px] leading-none mt-1.5 font-semibold tracking-[0.12em] uppercase text-slate-500">Infrastructure intelligence system</span>
             </span>
           </a>
@@ -170,7 +170,7 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
                 <TextReveal text="Move projects forward." className="landing-hero-accent block" delay={100} />
               </h1>
               <p className="mt-6 text-base sm:text-lg leading-relaxed text-slate-600 max-w-2xl">
-                DHRISTI turns monthly project records into explainable risk intelligence,
+                DRISHTI turns monthly project records into explainable risk intelligence,
                 early warnings and accountable intervention workflows for high-value infrastructure.
               </p>
               <p className="mt-4 text-[11px] uppercase tracking-[0.12em] font-bold text-navy-600 max-w-xl leading-relaxed">
@@ -254,7 +254,7 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
           <div className="landing-container">
             <div className="landing-section-heading">
               <div><p className="landing-kicker"><Sparkles className="w-3.5 h-3.5" /> Decision capability</p><h2>One connected view from data to action.</h2></div>
-              <p>DHRISTI keeps facts, calculations, predictions and human decisions visibly separate—then connects them through evidence.</p>
+              <p>DRISHTI keeps facts, calculations, predictions and human decisions visibly separate—then connects them through evidence.</p>
             </div>
             <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 mt-10">
               {CAPABILITIES.map(item => {
@@ -279,7 +279,7 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
             <div>
               <p className="landing-kicker"><Network className="w-3.5 h-3.5" /> Intelligence workflow</p>
               <h2 className="landing-display-heading mt-4">Every conclusion should be traceable.</h2>
-              <p className="text-sm text-slate-600 leading-relaxed mt-5 max-w-lg">DHRISTI is designed for scrutiny. Numerical facts originate in stored records, analytics remain deterministic, model signals carry versions, and interventions retain ownership.</p>
+              <p className="text-sm text-slate-600 leading-relaxed mt-5 max-w-lg">DRISHTI is designed for scrutiny. Numerical facts originate in stored records, analytics remain deterministic, model signals carry versions, and interventions retain ownership.</p>
               <button type="button" onClick={onSignIn} className="landing-text-link mt-6">Open the Command Center <ArrowRight className="w-4 h-4" /></button>
             </div>
             <div className="landing-workflow" role="img" aria-label="Source data flows to derived signals, predictions, warnings and accountable interventions">
@@ -326,8 +326,8 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
           <div className="landing-container text-center relative z-10">
             <p className="landing-kicker justify-center"><CircleGauge className="w-3.5 h-3.5" /> Decision intelligence for delivery</p>
             <h2>Turn the next reporting cycle into action.</h2>
-            <p>Enter the secure DHRISTI workspace to review portfolios, investigate risk and manage interventions.</p>
-            <button type="button" onClick={onSignIn} className="landing-primary-btn mt-7">Sign in to DHRISTI <ArrowRight className="w-4 h-4" /></button>
+            <p>Enter the secure DRISHTI workspace to review portfolios, investigate risk and manage interventions.</p>
+            <button type="button" onClick={onSignIn} className="landing-primary-btn mt-7">Sign in to DRISHTI <ArrowRight className="w-4 h-4" /></button>
           </div>
         </section>
       </main>
@@ -335,13 +335,13 @@ export default function LandingPage({ onSignIn, onPublicEnquiry }: LandingPagePr
       <footer className="landing-footer">
         <div className="landing-container grid md:grid-cols-[1.4fr_.6fr_.6fr] gap-10 py-12">
           <div>
-            <div className="flex items-center gap-3"><span className="landing-brand-mark landing-brand-mark--dark">D</span><span className="font-extrabold tracking-[0.12em]">DHRISTI</span></div>
+            <div className="flex items-center gap-3"><span className="landing-brand-mark landing-brand-mark--dark">D</span><span className="font-extrabold tracking-[0.12em]">DRISHTI</span></div>
             <p className="text-xs text-slate-400 leading-relaxed mt-4 max-w-md">Delay &amp; Risk Intelligence System for High-value Transport &amp; Infrastructure. Built for evidence-led monitoring and accountable public-project delivery.</p>
           </div>
           <div><h3>Platform</h3><a href="#capabilities">Capabilities</a><a href="#workflow">Evidence workflow</a><a href="#coverage">Coverage</a></div>
           <div><h3>Access</h3><button type="button" onClick={onPublicEnquiry}>Public project enquiry</button><button type="button" onClick={onSignIn}>Secure sign in</button><a href="#assurance">Governance</a><a href="#top">Back to top</a></div>
         </div>
-        <div className="border-t border-white/10"><div className="landing-container flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 text-[10px] text-slate-500"><span>© 2026 DHRISTI · Infrastructure &amp; Project Monitoring Division</span><span>Government monitoring workspace · Authorized access only</span></div></div>
+        <div className="border-t border-white/10"><div className="landing-container flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 text-[10px] text-slate-500"><span>© 2026 DRISHTI · Infrastructure &amp; Project Monitoring Division</span><span>Government monitoring workspace · Authorized access only</span></div></div>
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
 /* =============================================================================
-   DHRISTI — Global Styles
+   DRISHTI — Global Styles
    Infrastructure Project Monitoring & Intelligence Platform
    ============================================================================= */
 
@@ -50,7 +50,7 @@
 }
 
 /* =============================================================================
-   DHRISTI Civic Meridian UI
+   DRISHTI Civic Meridian UI
    UI-only visual layer: evidence-led, calm, accessible and motion-aware.
    ============================================================================= */
 /* Kept unlayered so these product-level tokens intentionally override legacy
@@ -402,7 +402,7 @@
 }
 
 /* =============================================================================
-   DHRISTI public landing experience
+   DRISHTI public landing experience
    ============================================================================= */
 @layer components {
   .landing-page {
@@ -1106,7 +1106,7 @@
 }
 
 /* =============================================================================
-   DHRISTI institutional visual system
+   DRISHTI institutional visual system
    Restrained public-sector identity with operational-console detailing.
    ============================================================================= */
 

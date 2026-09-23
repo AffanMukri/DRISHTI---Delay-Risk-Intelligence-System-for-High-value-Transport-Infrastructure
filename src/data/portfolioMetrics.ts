@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Portfolio Metrics & Trend Data
+// DRISHTI — Portfolio Metrics & Trend Data
 // =============================================================================
 
 import type { PortfolioMetrics, SectorRisk, TrendDataPoint, Ministry, InsightCard } from '../types';

@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Top Header with Global Search
+// DRISHTI — Top Header with Global Search
 // =============================================================================
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -78,7 +78,7 @@ export default function Header() {
             </span>
           </div>
           <div className="flex items-center gap-1 text-2xs text-slate-500 min-w-0 mt-0.5">
-            <span className="font-semibold text-navy-600">DHRISTI Intelligence Grid</span>
+            <span className="font-semibold text-navy-600">DRISHTI Intelligence Grid</span>
             <ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />
             <span className="truncate">{breadcrumb}</span>
           </div>

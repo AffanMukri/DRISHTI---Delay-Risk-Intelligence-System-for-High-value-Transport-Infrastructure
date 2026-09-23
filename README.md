@@ -1,6 +1,6 @@
-# DHRISTI
+# DRISHTI
 
-DHRISTI (Delay & Risk Intelligence System for High-value Transport & Infrastructure) is a React 19 + TypeScript + Vite frontend backed by FastAPI and
+DRISHTI (Delay & Risk Intelligence System for High-value Transport & Infrastructure) is a React 19 + TypeScript + Vite frontend backed by FastAPI and
 Supabase PostgreSQL/Auth. The existing dashboard UI is preserved; data access
 is routed through the typed service layer in `src/services`.
 
@@ -40,7 +40,7 @@ npm run demo
 The local demo account configured in this workspace is:
 
 ```text
-Email: admin@dhristi.local
+Email: admin@drishti.local
 Password: configured in `.env.demo.local`
 ```
 

@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Project Intelligence Page
+// DRISHTI — Project Intelligence Page
 // Detailed project drill-down: Health Score, Risk Breakdown, Timeline, Why flagged
 // =============================================================================
 

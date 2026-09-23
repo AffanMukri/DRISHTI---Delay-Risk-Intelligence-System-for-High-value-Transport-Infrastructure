@@ -17,7 +17,7 @@ from app.services.assistant import AssistantDocumentService, AssistantService
 
 router = APIRouter(
     prefix="/assistant",
-    tags=["Ask DHRISTI"],
+    tags=["Ask DRISHTI"],
     dependencies=[Depends(get_current_profile)],
 )
 
@@ -25,7 +25,7 @@ router = APIRouter(
 @router.post(
     "/ask",
     response_model=AssistantAnswerResponse,
-    summary="Answer a grounded DHRISTI intelligence question",
+    summary="Answer a grounded DRISHTI intelligence question",
 )
 async def ask_pragati_x(
     request: AssistantQuestionRequest,

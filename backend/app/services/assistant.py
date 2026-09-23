@@ -182,7 +182,7 @@ class AssistantService:
     def _fallback_answer(routed: RoutedQuestion, evidence: list[AssistantEvidence]) -> str:
         if not evidence:
             return (
-                "I do not have enough trusted DHRISTI evidence to answer this question. "
+                "I do not have enough trusted DRISHTI evidence to answer this question. "
                 "Try identifying a project, narrowing the request, or uploading a relevant project PDF."
             )
         if routed.intent == "cost_schedule_filter":

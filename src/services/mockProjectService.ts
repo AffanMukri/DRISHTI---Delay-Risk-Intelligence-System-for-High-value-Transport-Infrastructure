@@ -189,8 +189,8 @@ export class MockProjectService implements ProjectDataService {
 
   async getInterventionOfficers(): Promise<InterventionOfficer[]> {
     return [
-      { id: '10000000-0000-0000-0000-000000000001', fullName: 'Monitoring Officer', email: 'monitoring@dhristi.local', role: 'Monitoring Officer' },
-      { id: '10000000-0000-0000-0000-000000000002', fullName: 'Executive Officer', email: 'executive@dhristi.local', role: 'Executive' },
+      { id: '10000000-0000-0000-0000-000000000001', fullName: 'Monitoring Officer', email: 'monitoring@drishti.local', role: 'Monitoring Officer' },
+      { id: '10000000-0000-0000-0000-000000000002', fullName: 'Executive Officer', email: 'executive@drishti.local', role: 'Executive' },
     ];
   }
 

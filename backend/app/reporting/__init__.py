@@ -1,1 +1,1 @@
-"""Server-side document builders for authenticated DHRISTI reports."""
+"""Server-side document builders for authenticated DRISHTI reports."""

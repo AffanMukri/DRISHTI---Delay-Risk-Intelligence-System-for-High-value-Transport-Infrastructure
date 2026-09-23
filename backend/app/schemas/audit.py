@@ -62,7 +62,7 @@ class AuditFilterOptions(APIModel):
 
 
 class SecurityAuditMetadata(APIModel):
-    client: str = Field(default="dhristi-web", min_length=1, max_length=64)
+    client: str = Field(default="drishti-web", min_length=1, max_length=64)
 
 
 class SecurityAuditEventRequest(APIModel):

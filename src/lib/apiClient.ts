@@ -137,7 +137,7 @@ class ApiClient {
         if (error instanceof DOMException && error.name === 'AbortError') throw error;
         const apiError = error instanceof ApiError
           ? error
-          : new ApiError('Unable to reach the DHRISTI API.', 0, 'network_error', error);
+          : new ApiError('Unable to reach the DRISHTI API.', 0, 'network_error', error);
         if (!apiError.isRetryable || attempt >= maxRetries) throw apiError;
         await wait(250 * (2 ** attempt), options.signal ?? undefined);
         attempt += 1;
@@ -188,7 +188,7 @@ class ApiClient {
         const disposition = response.headers.get('content-disposition') || '';
         const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
         const plainMatch = disposition.match(/filename="?([^";]+)"?/i);
-        const encodedName = utf8Match?.[1] || plainMatch?.[1] || 'dhristi-report';
+        const encodedName = utf8Match?.[1] || plainMatch?.[1] || 'drishti-report';
         let fileName = encodedName;
         try {
           fileName = decodeURIComponent(encodedName);
@@ -206,7 +206,7 @@ class ApiClient {
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') throw error;
         if (error instanceof ApiError) throw error;
-        throw new ApiError('Unable to reach the DHRISTI API.', 0, 'network_error', error);
+        throw new ApiError('Unable to reach the DRISHTI API.', 0, 'network_error', error);
       }
     }
   }

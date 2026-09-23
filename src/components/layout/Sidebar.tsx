@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Sidebar Navigation
+// DRISHTI — Sidebar Navigation
 // =============================================================================
 
 import React, { useState } from 'react';
@@ -161,7 +161,7 @@ export default function Sidebar() {
               D
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-bold text-white tracking-[0.08em] leading-none">DHRISTI</div>
+              <div className="text-sm font-bold text-white tracking-[0.08em] leading-none">DRISHTI</div>
               <div className="text-[9px] text-teal-200/80 truncate leading-tight mt-1 uppercase tracking-[0.08em]">Delay · Risk · Action</div>
             </div>
           </div>

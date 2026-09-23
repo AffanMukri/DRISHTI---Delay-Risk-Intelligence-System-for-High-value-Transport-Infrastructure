@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Intervention Center Page
+// DRISHTI — Intervention Center Page
 // Inter-Ministerial Coordination, Escalations, and Action Item Governance
 // =============================================================================
 

@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Command Center Page
+// DRISHTI — Command Center Page
 // The flagship dashboard: Monitor → Understand → Identify Risk → Warn → Act
 // =============================================================================
 
@@ -92,7 +92,7 @@ export default function CommandCenter() {
           </div>
           <div>
             <div className="command-hero__eyebrow">
-              Government of India <span className="w-1 h-1 rounded-full bg-amber-400" /> DHRISTI Executive Desk
+              Government of India <span className="w-1 h-1 rounded-full bg-amber-400" /> DRISHTI Executive Desk
             </div>
             <h1 className="text-2xl lg:text-[1.7rem] font-bold text-white mt-1.5">Infrastructure Command Center</h1>
             <p className="text-sm text-sky-100/80 mt-1">National portfolio health, emerging risks and intervention priorities</p>
@@ -444,7 +444,7 @@ export default function CommandCenter() {
       {/* Footer */}
       <div className="text-center py-4 border-t border-slate-200">
         <p className="text-2xs text-slate-400">
-          Delay & Risk Intelligence System for High-value Transport & Infrastructure · DHRISTI ·
+          Delay & Risk Intelligence System for High-value Transport & Infrastructure · DRISHTI ·
           Data shown in this prototype is for demonstration purposes.
         </p>
       </div>

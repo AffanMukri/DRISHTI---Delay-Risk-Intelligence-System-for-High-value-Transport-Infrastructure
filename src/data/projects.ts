@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Synthetic Project Data
+// DRISHTI — Synthetic Project Data
 // All data is synthetic and for demonstration purposes only.
 // Relationships between costs, progress, milestones, and risk scores are
 // deliberately kept logically consistent.

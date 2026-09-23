@@ -182,7 +182,7 @@ def rule_component(row: dict[str, Any], config: RiskConfiguration) -> dict[str, 
         "provenance": {
             "type": "deterministic_rules",
             "version": RULE_VERSION,
-            "description": "Exact refactor of the original DHRISTI five-factor formula.",
+            "description": "Exact refactor of the original DRISHTI five-factor formula.",
         },
     }
 

@@ -36,7 +36,7 @@ function readable(value: unknown): string {
 
 function messageFrom(error: unknown): string {
   if (error instanceof ApiError) return error.message;
-  return error instanceof Error ? error.message : 'Ask DHRISTI could not complete the request.';
+  return error instanceof Error ? error.message : 'Ask DRISHTI could not complete the request.';
 }
 
 export function AskPragatiX({ projectId, projectName, backendEnabled, canUploadDocuments }: AskPragatiXProps) {
@@ -123,7 +123,7 @@ export function AskPragatiX({ projectId, projectName, backendEnabled, canUploadD
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-navy-800 text-white"><Sparkles className="h-4 w-4" /></div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-sm font-bold text-navy-900">Ask DHRISTI</h2>
+              <h2 className="text-sm font-bold text-navy-900">Ask DRISHTI</h2>
               <Badge variant="info">Evidence-grounded</Badge>
             </div>
             <p className="mt-0.5 truncate text-xs text-slate-500">Structured analytics and indexed project documents for {projectName}</p>
@@ -136,7 +136,7 @@ export function AskPragatiX({ projectId, projectName, backendEnabled, canUploadD
         <div className="space-y-4 border-t border-slate-100 p-5">
           {!backendEnabled && (
             <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-              Ask DHRISTI requires the authenticated FastAPI data source. It does not generate answers from mock project data.
+              Ask DRISHTI requires the authenticated FastAPI data source. It does not generate answers from mock project data.
             </div>
           )}
 
@@ -156,7 +156,7 @@ export function AskPragatiX({ projectId, projectName, backendEnabled, canUploadD
               placeholder="Ask a supported project, risk, intervention, comparison, attention, or document question…"
               maxLength={1200}
               disabled={!backendEnabled || loading}
-              aria-label="Ask DHRISTI question"
+              aria-label="Ask DRISHTI question"
             />
             <button type="submit" className="btn btn-primary flex items-center justify-center gap-1.5 text-xs" disabled={!backendEnabled || loading || question.trim().length < 3}>
               <Send className="h-3.5 w-3.5" />{loading ? 'Retrieving evidence…' : 'Ask'}

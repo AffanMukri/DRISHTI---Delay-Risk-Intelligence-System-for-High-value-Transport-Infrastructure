@@ -1,1 +1,1 @@
-"""Grounded Ask DHRISTI retrieval and synthesis components."""
+"""Grounded Ask DRISHTI retrieval and synthesis components."""

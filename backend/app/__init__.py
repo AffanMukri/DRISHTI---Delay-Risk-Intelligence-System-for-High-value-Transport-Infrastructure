@@ -1,1 +1,1 @@
-"""DHRISTI backend package."""
+"""DRISHTI backend package."""

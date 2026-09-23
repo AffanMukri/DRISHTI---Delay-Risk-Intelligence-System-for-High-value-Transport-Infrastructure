@@ -14,9 +14,9 @@ try {
   });
   await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: 'Sign in', exact: true }).first().click();
-  await page.getByLabel('Email address').fill('admin@dhristi.local');
+  await page.getByLabel('Email address').fill('admin@drishti.local');
   await page.getByLabel('Assigned access role').selectOption('administrator');
-  await page.getByLabel('Password', { exact: true }).fill('DhristiAdmin@2026!');
+  await page.getByLabel('Password', { exact: true }).fill('DrishtiAdmin@2026!');
   await page.getByRole('button', { name: 'Sign In' }).click();
   await page.getByRole('heading', { name: 'Infrastructure Command Center', exact: true })
     .waitFor({ state: 'visible' });

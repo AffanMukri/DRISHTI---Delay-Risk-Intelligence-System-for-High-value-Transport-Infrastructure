@@ -118,7 +118,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
             <div className="flex items-center gap-3 mb-10">
               <div className="institutional-mark w-11 h-11 rounded-xl text-sm font-extrabold tracking-tight">D</div>
               <div>
-                <p className="text-sm font-bold tracking-[0.09em]">DHRISTI</p>
+                <p className="text-sm font-bold tracking-[0.09em]">DRISHTI</p>
                 <p className="text-[9px] uppercase tracking-[0.14em] text-teal-200/75 mt-0.5">Infrastructure Intelligence</p>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
                 D
               </div>
               <div>
-                <p className="font-bold tracking-[0.08em] text-navy-900">DHRISTI</p>
+                <p className="font-bold tracking-[0.08em] text-navy-900">DRISHTI</p>
                 <p className="text-2xs text-slate-500">Delay &amp; Risk Intelligence System</p>
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
               <p className="text-sm text-slate-500 mt-1">
                 {mode === 'login'
                   ? 'Use your registered email and password to continue.'
-                  : 'Register for secure access to DHRISTI.'}
+                  : 'Register for secure access to DRISHTI.'}
               </p>
             </div>
 

@@ -119,7 +119,7 @@ export function PragatiDataProvider({ children, role }: { children: React.ReactN
   } : null, [data, reload, acknowledgeWarning, updateWarning, createIntervention, updateIntervention]);
 
   if (loading && !value) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><LoadingState message="Loading DHRISTI portfolio data..." /></div>;
+    return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><LoadingState message="Loading DRISHTI portfolio data..." /></div>;
   }
   if (error && !value) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6"><div className="card max-w-lg w-full"><ErrorState description={error} onRetry={reload} /></div></div>;

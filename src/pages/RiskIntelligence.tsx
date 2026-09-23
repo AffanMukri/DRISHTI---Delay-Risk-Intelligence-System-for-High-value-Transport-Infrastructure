@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Risk Intelligence Page
+// DRISHTI — Risk Intelligence Page
 // Advanced Portfolio-Level Risk Diagnostics & Prioritization Matrix
 // =============================================================================
 
@@ -634,7 +634,7 @@ export default function RiskIntelligence() {
       {/* Methodology Modal */}
       {showFormulaModal && (
         <Modal
-          title="DHRISTI Risk Scoring Methodology"
+          title="DRISHTI Risk Scoring Methodology"
           isOpen={showFormulaModal}
           onClose={() => setShowFormulaModal(false)}
         >

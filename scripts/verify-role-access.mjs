@@ -2,22 +2,22 @@ import { chromium } from 'playwright-core';
 
 const accounts = [
   {
-    email: 'admin@dhristi.local', password: 'DhristiAdmin@2026!', role: 'administrator', label: 'Administrator',
+    email: 'admin@drishti.local', password: 'DrishtiAdmin@2026!', role: 'administrator', label: 'Administrator',
     visibleGroups: ['Administration', 'Insights & Models', 'Operations', 'Risk & Action'], hiddenGroups: [],
     group: 'Administration', visibleItem: 'Master Access Portal', hiddenItem: null,
   },
   {
-    email: 'executive@dhristi.local', password: 'DhristiExec@2026!', role: 'executive', label: 'Executive',
+    email: 'executive@drishti.local', password: 'DrishtiExec@2026!', role: 'executive', label: 'Executive',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations', 'Insights & Models'], hiddenGroups: ['Administration'],
     group: 'Operations', visibleItem: 'Reports', hiddenItem: 'Data Management',
   },
   {
-    email: 'officer@dhristi.local', password: 'DhristiOfficer@2026!', role: 'monitoring_officer', label: 'Monitoring Officer',
+    email: 'officer@drishti.local', password: 'DrishtiOfficer@2026!', role: 'monitoring_officer', label: 'Monitoring Officer',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations'], hiddenGroups: ['Administration', 'Insights & Models'],
     group: 'Operations', visibleItem: 'Data Management', hiddenItem: null,
   },
   {
-    email: 'analyst@dhristi.local', password: 'DhristiAnalyst@2026!', role: 'analyst', label: 'Analyst',
+    email: 'analyst@drishti.local', password: 'DrishtiAnalyst@2026!', role: 'analyst', label: 'Analyst',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations', 'Insights & Models'], hiddenGroups: ['Administration'],
     group: 'Risk & Action', visibleItem: 'Risk Intelligence', hiddenItem: 'Intervention Center',
   },
@@ -65,9 +65,9 @@ try {
   const mismatchContext = await browser.newContext();
   const mismatchPage = await mismatchContext.newPage();
   await openLogin(mismatchPage);
-  await mismatchPage.getByLabel('Email address').fill('admin@dhristi.local');
+  await mismatchPage.getByLabel('Email address').fill('admin@drishti.local');
   await mismatchPage.getByLabel('Assigned access role').selectOption('executive');
-  await mismatchPage.getByLabel('Password', { exact: true }).fill('DhristiAdmin@2026!');
+  await mismatchPage.getByLabel('Password', { exact: true }).fill('DrishtiAdmin@2026!');
   await mismatchPage.getByRole('button', { name: 'Sign In' }).click();
   await mismatchPage.getByText('The selected role does not match the role assigned to this account.', { exact: true }).waitFor();
   await mismatchContext.close();

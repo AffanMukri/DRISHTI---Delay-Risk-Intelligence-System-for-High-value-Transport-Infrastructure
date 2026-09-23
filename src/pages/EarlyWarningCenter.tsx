@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Early Warning Center
+// DRISHTI — Early Warning Center
 // =============================================================================
 
 import React, { useState, useMemo } from 'react';

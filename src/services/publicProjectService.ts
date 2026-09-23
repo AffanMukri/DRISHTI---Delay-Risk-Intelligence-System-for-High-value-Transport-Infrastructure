@@ -106,10 +106,10 @@ export function projectIdFromQrPayload(payload: string): string | null {
     const candidate = url.searchParams.get('publicProject');
     if (candidate && /^[a-z0-9_-]{2,100}$/i.test(candidate)) return candidate;
   } catch {
-    // Plain project identifiers and DHRISTI payloads are accepted below.
+    // Plain project identifiers and DRISHTI payloads are accepted below.
   }
 
-  const prefixed = value.match(/^DHRISTI:PROJECT:([a-z0-9_-]{2,100})$/i)?.[1];
+  const prefixed = value.match(/^DRISHTI:PROJECT:([a-z0-9_-]{2,100})$/i)?.[1];
   if (prefixed) return prefixed;
   return /^[a-z0-9_-]{2,100}$/i.test(value) ? value : null;
 }

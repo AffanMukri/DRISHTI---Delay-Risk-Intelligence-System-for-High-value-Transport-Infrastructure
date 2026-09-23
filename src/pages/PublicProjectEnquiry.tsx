@@ -143,7 +143,7 @@ export default function PublicProjectEnquiry({
         if (!active || !result) return;
         const projectId = projectIdFromQrPayload(result.getText());
         if (!projectId) {
-          setCameraError('This QR code is not a valid DHRISTI public-project code.');
+          setCameraError('This QR code is not a valid DRISHTI public-project code.');
           return;
         }
         controls.stop();
@@ -172,9 +172,9 @@ export default function PublicProjectEnquiry({
     <div className="min-h-screen bg-[#f4f7f5] text-slate-900">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          <button type="button" onClick={onBack} className="flex items-center gap-3 text-left" aria-label="Return to DHRISTI home">
+          <button type="button" onClick={onBack} className="flex items-center gap-3 text-left" aria-label="Return to DRISHTI home">
             <span className="landing-brand-mark">D</span>
-            <span><span className="block text-sm font-extrabold tracking-[0.12em] text-navy-900">DHRISTI</span><span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">Public project enquiry</span></span>
+            <span><span className="block text-sm font-extrabold tracking-[0.12em] text-navy-900">DRISHTI</span><span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">Public project enquiry</span></span>
           </button>
           <div className="flex items-center gap-2">
             <span className="hidden items-center gap-1.5 text-[10px] font-semibold text-emerald-700 sm:inline-flex"><ShieldCheck className="h-3.5 w-3.5" /> Public information only</span>
@@ -189,7 +189,7 @@ export default function PublicProjectEnquiry({
           <div className="relative mx-auto max-w-5xl text-center">
             <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-200"><Landmark className="h-3.5 w-3.5" /> No sign-in required</p>
             <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">Find a public infrastructure project</h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-300">Search by project name or ID, or scan the DHRISTI QR displayed at a project site. Only approved public facts and the published estimated timeline are shown.</p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-300">Search by project name or ID, or scan the DRISHTI QR displayed at a project site. Only approved public facts and the published estimated timeline are shown.</p>
 
             <div className="mx-auto mt-7 flex max-w-3xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur sm:flex-row">
               <label className="relative flex-1">
@@ -246,7 +246,7 @@ export default function PublicProjectEnquiry({
                       <div className="rounded-xl border border-slate-200 bg-white p-4"><CalendarDays className="h-4 w-4 text-teal-700" /><p className="mt-3 text-[10px] text-slate-500">Original target</p><p className="mt-1 text-xs font-bold text-navy-900">{formatDate(selected.originalCompletionDate)}</p></div>
                       <div className="rounded-xl border border-slate-200 bg-white p-4"><Clock3 className="h-4 w-4 text-blue-700" /><p className="mt-3 text-[10px] text-slate-500">Current published target</p><p className="mt-1 text-xs font-bold text-navy-900">{formatDate(selected.revisedCompletionDate)}</p></div>
                     </div>
-                    <p className="mt-4 rounded-lg border border-blue-100 bg-blue-50 p-3 text-[10px] leading-4 text-blue-800">These are published project facts, not a DHRISTI risk assessment or model prediction. Target dates may change through formal project revisions.</p>
+                    <p className="mt-4 rounded-lg border border-blue-100 bg-blue-50 p-3 text-[10px] leading-4 text-blue-800">These are published project facts, not a DRISHTI risk assessment or model prediction. Target dates may change through formal project revisions.</p>
                   </div>
                 </div>
               </article>
@@ -276,12 +276,12 @@ export default function PublicProjectEnquiry({
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white px-4 py-5 text-center text-[10px] text-slate-500">DHRISTI public project information · Government infrastructure monitoring · For official enquiries, contact the implementing ministry or agency.</footer>
+      <footer className="border-t border-slate-200 bg-white px-4 py-5 text-center text-[10px] text-slate-500">DRISHTI public project information · Government infrastructure monitoring · For official enquiries, contact the implementing ministry or agency.</footer>
 
       {scannerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Scan a DHRISTI project QR code">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Scan a DRISHTI project QR code">
           <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-start justify-between border-b border-slate-200 p-4"><div><h2 className="text-sm font-bold text-navy-900">Scan project-site QR</h2><p className="mt-1 text-[10px] text-slate-500">Point the camera at an official DHRISTI project QR code.</p></div><button type="button" onClick={closeScanner} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Close QR scanner"><X className="h-4 w-4" /></button></div>
+            <div className="flex items-start justify-between border-b border-slate-200 p-4"><div><h2 className="text-sm font-bold text-navy-900">Scan project-site QR</h2><p className="mt-1 text-[10px] text-slate-500">Point the camera at an official DRISHTI project QR code.</p></div><button type="button" onClick={closeScanner} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Close QR scanner"><X className="h-4 w-4" /></button></div>
             <div className="relative aspect-square overflow-hidden bg-slate-950"><video ref={videoRef} className="h-full w-full object-cover" muted playsInline /><div className="pointer-events-none absolute inset-[15%] rounded-2xl border-2 border-teal-300 shadow-[0_0_0_999px_rgba(2,6,23,.42)]"><span className="absolute -left-0.5 -top-0.5 h-7 w-7 border-l-4 border-t-4 border-white" /><span className="absolute -right-0.5 -top-0.5 h-7 w-7 border-r-4 border-t-4 border-white" /><span className="absolute -bottom-0.5 -left-0.5 h-7 w-7 border-b-4 border-l-4 border-white" /><span className="absolute -bottom-0.5 -right-0.5 h-7 w-7 border-b-4 border-r-4 border-white" /></div></div>
             <div className="p-4">{cameraError ? <div className="flex gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{cameraError}</div> : <div className="flex items-center gap-2 text-xs text-slate-600"><Camera className="h-4 w-4 text-teal-700" />Waiting for a project QR code…</div>}<p className="mt-3 flex items-center gap-1.5 text-[10px] text-slate-400"><CheckCircle2 className="h-3.5 w-3.5 text-green-600" />Video is processed in your browser and is not uploaded.</p></div>
           </div>

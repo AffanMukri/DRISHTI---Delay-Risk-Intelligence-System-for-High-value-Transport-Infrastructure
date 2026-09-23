@@ -444,8 +444,8 @@ try {
   await page.getByText('Project Health Score', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Timeline & Milestones', { exact: true }).click();
   await page.getByText('Dependency graph requires backend data', { exact: true }).waitFor({ state: 'visible' });
-  await page.getByRole('button', { name: /Ask DHRISTI/ }).click();
-  await page.getByText('Ask DHRISTI requires the authenticated FastAPI data source. It does not generate answers from mock project data.', { exact: true }).waitFor({ state: 'visible' });
+  await page.getByRole('button', { name: /Ask DRISHTI/ }).click();
+  await page.getByText('Ask DRISHTI requires the authenticated FastAPI data source. It does not generate answers from mock project data.', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Cost Prediction', { exact: true }).click();
   await page.getByText('Real model inference is unavailable while the application is using the explicit offline mock data source.', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Schedule Prediction', { exact: true }).click();

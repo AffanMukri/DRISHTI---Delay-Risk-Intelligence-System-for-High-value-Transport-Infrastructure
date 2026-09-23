@@ -1,7 +1,7 @@
 import type { AuthProfile, AppRole } from './authorization';
 
-export const DEMO_SESSION_KEY = 'dhristi-demo-session';
-const DEMO_ACCESS_OVERRIDES_KEY = 'dhristi-demo-access-overrides';
+export const DEMO_SESSION_KEY = 'drishti-demo-session';
+const DEMO_ACCESS_OVERRIDES_KEY = 'drishti-demo-access-overrides';
 
 export interface DemoAccount {
   id: string;
@@ -23,7 +23,7 @@ const configuredAccounts: Omit<DemoAccount, 'isActive'>[] = [
     id: '00000000-0000-4000-8000-000000000001',
     email: import.meta.env.VITE_DEMO_ADMIN_EMAIL || '',
     password: import.meta.env.VITE_DEMO_ADMIN_PASSWORD || '',
-    fullName: 'DHRISTI Demo Administrator',
+    fullName: 'DRISHTI Demo Administrator',
     role: 'administrator',
     designation: 'System Administrator',
   },
@@ -31,7 +31,7 @@ const configuredAccounts: Omit<DemoAccount, 'isActive'>[] = [
     id: '00000000-0000-4000-8000-000000000002',
     email: import.meta.env.VITE_DEMO_EXECUTIVE_EMAIL || '',
     password: import.meta.env.VITE_DEMO_EXECUTIVE_PASSWORD || '',
-    fullName: 'DHRISTI Demo Executive',
+    fullName: 'DRISHTI Demo Executive',
     role: 'executive',
     designation: 'Portfolio Executive',
   },
@@ -39,7 +39,7 @@ const configuredAccounts: Omit<DemoAccount, 'isActive'>[] = [
     id: '00000000-0000-4000-8000-000000000003',
     email: import.meta.env.VITE_DEMO_OFFICER_EMAIL || '',
     password: import.meta.env.VITE_DEMO_OFFICER_PASSWORD || '',
-    fullName: 'DHRISTI Demo Monitoring Officer',
+    fullName: 'DRISHTI Demo Monitoring Officer',
     role: 'monitoring_officer',
     designation: 'Monitoring Officer',
   },
@@ -47,7 +47,7 @@ const configuredAccounts: Omit<DemoAccount, 'isActive'>[] = [
     id: '00000000-0000-4000-8000-000000000004',
     email: import.meta.env.VITE_DEMO_ANALYST_EMAIL || '',
     password: import.meta.env.VITE_DEMO_ANALYST_PASSWORD || '',
-    fullName: 'DHRISTI Demo Analyst',
+    fullName: 'DRISHTI Demo Analyst',
     role: 'analyst',
     designation: 'Infrastructure Analyst',
   },

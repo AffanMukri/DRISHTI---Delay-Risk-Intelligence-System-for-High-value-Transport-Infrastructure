@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI - authenticated backend report generation and dossier preview
+// DRISHTI - authenticated backend report generation and dossier preview
 // =============================================================================
 
 import { useEffect, useMemo, useState } from 'react';
@@ -347,7 +347,7 @@ export default function Reports() {
         </div>
 
         <div className="pt-8 border-t border-slate-300 mt-8 flex items-end justify-between text-2xs text-slate-500">
-          <div><p>Generated files use authenticated DHRISTI database records.</p><p>Numerical recommendations are labelled as analytical or workflow rule outputs.</p></div>
+          <div><p>Generated files use authenticated DRISHTI database records.</p><p>Numerical recommendations are labelled as analytical or workflow rule outputs.</p></div>
           <div className="text-right"><div className="w-32 border-b border-slate-400 ml-auto mb-1" /><p className="font-semibold text-slate-700">Authorized Reviewing Officer</p><p>Infrastructure and Project Monitoring Division</p></div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Type Definitions
+// DRISHTI — Type Definitions
 // Infrastructure Project Monitoring & Intelligence Platform
 // =============================================================================
 

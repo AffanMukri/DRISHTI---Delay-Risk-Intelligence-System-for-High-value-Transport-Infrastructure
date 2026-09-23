@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Warnings & Interventions Synthetic Data
+// DRISHTI — Warnings & Interventions Synthetic Data
 // =============================================================================
 
 import type { Warning, Intervention } from '../types';

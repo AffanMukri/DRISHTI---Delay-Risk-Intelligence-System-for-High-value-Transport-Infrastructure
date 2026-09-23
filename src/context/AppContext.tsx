@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Application Context
+// DRISHTI — Application Context
 // Global state management for navigation, role, filters, and search.
 // =============================================================================
 

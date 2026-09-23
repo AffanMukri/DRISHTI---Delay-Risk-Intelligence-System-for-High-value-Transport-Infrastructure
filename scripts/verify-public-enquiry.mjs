@@ -50,7 +50,7 @@ try {
   if (await page.getByText('Schedule Delay', { exact: true }).count()) throw new Error('Internal schedule analysis leaked into public view.');
 
   await page.getByRole('button', { name: 'Scan site QR' }).click();
-  await page.getByRole('dialog', { name: 'Scan a DHRISTI project QR code' }).waitFor();
+  await page.getByRole('dialog', { name: 'Scan a DRISHTI project QR code' }).waitFor();
   await page.getByRole('button', { name: 'Close QR scanner' }).click();
 
   await page.goto(`${origin}/?publicProject=PRJ-001`, { waitUntil: 'networkidle' });

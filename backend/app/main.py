@@ -28,7 +28,7 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
         version="1.0.0",
-        description="Authenticated project monitoring, CUF ingestion, risk, analytics, reporting, warning, and intervention API for DHRISTI.",
+        description="Authenticated project monitoring, CUF ingestion, risk, analytics, reporting, warning, and intervention API for DRISHTI.",
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/openapi.json",

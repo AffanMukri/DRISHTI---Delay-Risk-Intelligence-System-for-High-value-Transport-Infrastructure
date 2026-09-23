@@ -61,7 +61,7 @@ class AssistantAnswerResponse(APIModel):
     evidence: list[AssistantEvidence]
     limitations: list[str] = Field(default_factory=list)
     generated_at: datetime
-    disclaimer: str = "Answers are grounded in retrieved DHRISTI records and documents; missing values are not inferred."
+    disclaimer: str = "Answers are grounded in retrieved DRISHTI records and documents; missing values are not inferred."
 
 
 class AssistantDocumentResponse(APIModel):

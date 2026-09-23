@@ -83,7 +83,7 @@ export const AuditService = {
   async securityEvent(action: 'login_success' | 'logout_requested'): Promise<void> {
     await apiClient.post('/audit/security-events', {
       action,
-      metadata: { client: 'dhristi-web' },
+      metadata: { client: 'drishti-web' },
     });
   },
 };

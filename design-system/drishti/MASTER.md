@@ -1,4 +1,4 @@
-# DHRISTI Interface System
+# DRISHTI Interface System
 
 ## Direction
 

@@ -13,7 +13,7 @@ from app.repositories.predictions import PredictionRepository
 
 
 def arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Train and register the independent DHRISTI schedule model.")
+    parser = argparse.ArgumentParser(description="Train and register the independent DRISHTI schedule model.")
     parser.add_argument(
         "--version",
         default=datetime.now(UTC).strftime("%Y.%m.%d.%H%M"),

@@ -163,7 +163,7 @@ class ReportService:
         builder, media_type = builders[request.output_format]
         content = builder(report)
         scope = request.sector or str(request.ministry_id or request.project_id or "portfolio")
-        file_name = f"dhristi-{_slug(request.report_type.value)}-{_slug(scope)}-{request.reporting_month:%Y-%m}.{request.output_format.value}"
+        file_name = f"drishti-{_slug(request.report_type.value)}-{_slug(scope)}-{request.reporting_month:%Y-%m}.{request.output_format.value}"
         checksum = hashlib.sha256(content).hexdigest()
         await self.repository.record_export(
             export_id=report_id,

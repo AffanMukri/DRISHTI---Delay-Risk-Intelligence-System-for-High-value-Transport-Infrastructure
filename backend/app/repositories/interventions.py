@@ -95,7 +95,7 @@ class InterventionRepository(BaseRepository):
         )
         await self.session.execute(
             text("select set_config('app.intervention_event_note', :note, true)"),
-            {"note": values.get("notes") or "Intervention created through DHRISTI."},
+            {"note": values.get("notes") or "Intervention created through DRISHTI."},
         )
         result = await self.session.execute(text(f"""
             with inserted as (
@@ -184,7 +184,7 @@ class InterventionRepository(BaseRepository):
             remark
             or changes.get("resolution_summary")
             or changes.get("escalation_reason")
-            or "Intervention updated through DHRISTI."
+            or "Intervention updated through DRISHTI."
         )
         await self.session.execute(
             text("select set_config('app.intervention_event_source', 'api_patch', true)"),

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = "DHRISTI API"
+    app_name: str = "DRISHTI API"
     app_env: Literal["development", "test", "staging", "production"] = "development"
     api_prefix: str = "/api"
     log_level: str = "INFO"
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     cuf_max_rows: int = Field(default=10_000, ge=1, le=100_000)
     cuf_preview_rows: int = Field(default=100, ge=1, le=1000)
 
-    # Ask DHRISTI uses Ollama only to synthesize retrieved evidence. Numeric
+    # Ask DRISHTI uses Ollama only to synthesize retrieved evidence. Numeric
     # facts remain database-calculated and document retrieval uses pgvector.
     ollama_enabled: bool = False
     ollama_base_url: str = "http://127.0.0.1:11434"

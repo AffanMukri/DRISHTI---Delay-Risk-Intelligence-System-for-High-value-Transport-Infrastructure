@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Project Portfolio Page
+// DRISHTI — Project Portfolio Page
 // Enterprise data table with search, sort, filter, pagination
 // =============================================================================
 
@@ -100,7 +100,7 @@ export default function ProjectPortfolio() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'dhristi_portfolio_export.csv';
+    a.download = 'drishti_portfolio_export.csv';
     document.body.appendChild(a);
     a.click();
     a.remove();

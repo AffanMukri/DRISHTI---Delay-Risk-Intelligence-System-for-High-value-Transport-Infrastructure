@@ -1,5 +1,5 @@
 // =============================================================================
-// DHRISTI — Master Application Root
+// DRISHTI — Master Application Root
 // Infrastructure Project Monitoring & Intelligence Platform (MoSPI)
 // =============================================================================
 
@@ -143,7 +143,7 @@ function MainLayout() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 font-semibold text-navy-900">
                 <span className="w-1.5 h-1.5 rounded-full bg-gov-teal" />
-                DHRISTI v2.4
+                DRISHTI v2.4
               </span>
               <span>•</span>
               <span>Ministry of Statistics & Programme Implementation (MoSPI)</span>
