@@ -25,6 +25,9 @@ def get_engine() -> AsyncEngine:
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_max_overflow,
         pool_timeout=settings.db_pool_timeout_seconds,
+        # Supabase's transaction pooler is the correct serverless connection
+        # mode and does not support server-side prepared statements.
+        connect_args={"prepare_threshold": None},
     )
 
 

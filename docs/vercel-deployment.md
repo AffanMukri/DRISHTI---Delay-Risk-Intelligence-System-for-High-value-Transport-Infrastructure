@@ -77,7 +77,10 @@ VITE_ENABLE_MOCK_FALLBACK=false
 APP_ENV=production
 API_PREFIX=/api
 LOG_LEVEL=INFO
-DATABASE_URL=<Supabase session-pooler PostgreSQL URI with sslmode=require>
+DATABASE_URL=<Supabase transaction-pooler PostgreSQL URI with sslmode=require>
+DB_POOL_SIZE=1
+DB_MAX_OVERFLOW=0
+DB_POOL_TIMEOUT_SECONDS=10
 SUPABASE_URL=https://thxthjzgspqprqblzcbt.supabase.co
 SUPABASE_PUBLISHABLE_KEY=<same Supabase anon/publishable key>
 CORS_ORIGINS=["https://YOUR-PROJECT.vercel.app"]
@@ -89,6 +92,9 @@ ASSISTANT_DOCUMENT_DIR=/tmp/drishti/documents
 
 `DATABASE_URL` and any future service-role key are server-only. Never prefix
 them with `VITE_`. The current deployment does not require a service-role key.
+For Vercel, copy the **Transaction pooler** URI from Supabase **Connect**; the
+backend disables prepared statements and keeps each warm function's pool small
+for compatibility with this serverless connection mode.
 
 Vercel's filesystem is ephemeral. `/tmp` prevents write failures, but trained
 ML artifacts and uploaded RAG documents that must survive deployments should
