@@ -12,7 +12,10 @@ numpy>=2.2,<3.0
 scikit-learn>=1.7,<2.0
 scipy>=1.15,<2.0
 joblib>=1.4,<2.0
-shap>=0.52,<1.0
+# Keep SHAP's compiler stack deterministic and Python 3.12 compatible.
+shap==0.51.0
+numba==0.63.1
+llvmlite==0.46.0
 PyMuPDF>=1.26,<2.0
 reportlab>=4.2,<5.0
 
