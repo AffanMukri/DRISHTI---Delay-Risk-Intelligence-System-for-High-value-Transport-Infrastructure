@@ -12,6 +12,7 @@ import {
 } from '../services/auditService';
 
 const PAGE_SIZE = 50;
+const USE_BACKEND_DATA = import.meta.env.VITE_DATA_SOURCE !== 'mock';
 
 function label(value: string): string {
   return value.replace(/[._]/g, ' ').replace(/\b\w/g, character => character.toUpperCase());
@@ -120,6 +121,12 @@ export default function AuditTrail() {
         </button>
       </div>
 
+      {!USE_BACKEND_DATA && (
+        <div className="rounded border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+          <strong>Synthetic demonstration audit:</strong> these append-oriented sample events exercise search, filters, pagination, and event details. They contain no real users, requests, imports, credentials, or security tokens.
+        </div>
+      )}
+
       <div className="card p-4 space-y-3">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="relative xl:col-span-2">
@@ -132,19 +139,19 @@ export default function AuditTrail() {
               onKeyDown={event => { if (event.key === 'Enter') applyFilters(); }}
             />
           </label>
-          <select className="select text-xs" value={filters.action} onChange={event => setFilters(current => ({ ...current, action: event.target.value }))}>
+          <select aria-label="Audit action filter" className="select text-xs" value={filters.action} onChange={event => setFilters(current => ({ ...current, action: event.target.value }))}>
             <option value="">All actions</option>
             {options.actions.map(value => <option key={value} value={value}>{label(value)}</option>)}
           </select>
-          <select className="select text-xs" value={filters.entityType} onChange={event => setFilters(current => ({ ...current, entityType: event.target.value }))}>
+          <select aria-label="Audit entity type filter" className="select text-xs" value={filters.entityType} onChange={event => setFilters(current => ({ ...current, entityType: event.target.value }))}>
             <option value="">All entity types</option>
             {options.entityTypes.map(value => <option key={value} value={value}>{label(value)}</option>)}
           </select>
-          <select className="select text-xs" value={filters.source} onChange={event => setFilters(current => ({ ...current, source: event.target.value }))}>
+          <select aria-label="Audit source filter" className="select text-xs" value={filters.source} onChange={event => setFilters(current => ({ ...current, source: event.target.value }))}>
             <option value="">All sources</option>
             {options.sources.map(value => <option key={value} value={value}>{label(value)}</option>)}
           </select>
-          <select className="select text-xs" value={filters.actorId} onChange={event => setFilters(current => ({ ...current, actorId: event.target.value }))}>
+          <select aria-label="Audit actor filter" className="select text-xs" value={filters.actorId} onChange={event => setFilters(current => ({ ...current, actorId: event.target.value }))}>
             <option value="">All actors</option>
             {options.actors.map(actor => <option key={actor.id} value={actor.id}>{actor.fullName || actor.email}</option>)}
           </select>
@@ -224,4 +231,3 @@ export default function AuditTrail() {
     </div>
   );
 }
-

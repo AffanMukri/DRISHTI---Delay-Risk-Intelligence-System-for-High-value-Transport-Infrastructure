@@ -117,6 +117,8 @@ export interface RiskTrajectory {
     meaningfulIncreasePoints: number;
     rapidIncreasePoints: number;
   };
+  provenance?: 'persisted_backend' | 'synthetic_demo_reconstruction';
+  methodology?: string;
 }
 
 export type DataConfidenceRating = 'High' | 'Moderate' | 'Low' | 'Very Low';
@@ -341,6 +343,8 @@ export interface ProjectMonthlyUpdate {
 
 export interface ProjectHistory {
   projectId: string;
+  dataSource?: 'persisted_backend' | 'synthetic_demo_series';
+  methodology?: string;
   monthlyUpdates: ProjectMonthlyUpdate[];
   costHistory: Array<{
     effectiveDate: string;
@@ -607,7 +611,7 @@ export interface CostOverrunPrediction {
   };
   explanation: PredictionExplanation;
   generatedAt: string;
-  synthetic: false;
+  synthetic: boolean;
 }
 
 export interface ScheduleOverrunPrediction {
@@ -652,7 +656,7 @@ export interface ScheduleOverrunPrediction {
   };
   explanation: PredictionExplanation;
   generatedAt: string;
-  synthetic: false;
+  synthetic: boolean;
 }
 
 export interface ScenarioVariable {
@@ -677,6 +681,7 @@ export interface ScenarioConfiguration {
   modelVersions: Record<string, string>;
   persistsChanges: false;
   disclaimer: string;
+  methodology?: 'trained_model' | 'deterministic_demo';
 }
 
 export interface ScenarioOutcome {
@@ -734,6 +739,7 @@ export interface ScenarioSimulation {
   assumptionNote?: string;
   persistsChanges: false;
   disclaimer: string;
+  methodology?: 'trained_model' | 'deterministic_demo';
 }
 
 export type EvidenceStage = 'source_data' | 'derived_signal' | 'prediction' | 'explanation' | 'warning' | 'intervention';

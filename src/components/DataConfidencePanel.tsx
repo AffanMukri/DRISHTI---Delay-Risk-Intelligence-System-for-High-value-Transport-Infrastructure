@@ -50,6 +50,12 @@ export function DataConfidencePanel({ confidence, loading = false, error, onRetr
         </div>
       </div>
 
+      {confidence.configuration.formulaVersion.startsWith('demo-') && (
+        <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+          <strong>Synthetic demonstration assessment:</strong> {confidence.configuration.statement}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="rounded border border-slate-200 bg-slate-50 p-5 flex flex-col justify-center items-center text-center">
           <p className="text-2xs uppercase tracking-wide text-slate-500">Overall Data Confidence</p>

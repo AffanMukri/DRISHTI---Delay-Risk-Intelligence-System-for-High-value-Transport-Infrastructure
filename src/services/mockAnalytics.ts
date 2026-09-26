@@ -1,5 +1,6 @@
 import { PROJECTS } from '../data/projects';
-import type { Project } from '../types';
+import type { Project, ProjectMonthlyUpdate } from '../types';
+import { buildMockProjectHistory } from './mockProjectIntelligence';
 import type {
   CostAggregateBreakdown,
   CostAnalyticsFilters,
@@ -92,11 +93,46 @@ function projectCost(project: Project): ProjectCostBreakdown {
     expenditurePercentage,
     physicalProgress: project.physicalProgress,
     progressMismatch: expenditurePercentage === null ? null : expenditurePercentage - project.physicalProgress,
-    approvedCostSource: 'project_snapshot',
-    revisedCostSource: 'project_snapshot',
-    expenditureSource: 'project_snapshot',
-    hasMonthlyHistory: false,
+    approvedCostSource: 'synthetic_demo_snapshot',
+    revisedCostSource: 'synthetic_demo_snapshot',
+    expenditureSource: 'synthetic_demo_snapshot',
+    hasMonthlyHistory: true,
   };
+}
+
+function monthKey(value: string): string {
+  return `${value.slice(0, 7)}-01`;
+}
+
+function costTrend(projects: Project[]): CostAnalyticsResponse['series'] {
+  const periods = new Map<string, ProjectMonthlyUpdate[]>();
+  for (const project of projects) {
+    for (const update of buildMockProjectHistory(project.id).monthlyUpdates) {
+      const period = monthKey(update.reportingMonth);
+      periods.set(period, [...(periods.get(period) ?? []), update]);
+    }
+  }
+  return [...periods.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([period, updates]) => {
+    const approved = updates.filter(update => update.approvedCost !== undefined);
+    const revised = updates.filter(update => update.revisedCost !== undefined);
+    const expenditure = updates.filter(update => update.expenditure !== undefined);
+    const originalApprovedCost = approved.reduce((sum, update) => sum + (update.approvedCost ?? 0), 0);
+    const latestRevisedCost = revised.reduce((sum, update) => sum + (update.revisedCost ?? 0), 0);
+    const cumulativeExpenditure = expenditure.reduce((sum, update) => sum + (update.expenditure ?? 0), 0);
+    const absoluteCostEscalation = latestRevisedCost - originalApprovedCost;
+    return {
+      period,
+      reportingProjects: updates.length,
+      approvedCostProjects: approved.length,
+      revisedCostProjects: revised.length,
+      expenditureProjects: expenditure.length,
+      originalApprovedCost,
+      latestRevisedCost,
+      cumulativeExpenditure,
+      absoluteCostEscalation,
+      costEscalationPercentage: originalApprovedCost > 0 ? absoluteCostEscalation / originalApprovedCost * 100 : null,
+    };
+  });
 }
 
 export function buildMockCostAnalytics(filters: CostAnalyticsFilters = {}): CostAnalyticsResponse {
@@ -105,6 +141,7 @@ export function buildMockCostAnalytics(filters: CostAnalyticsFilters = {}): Cost
     && (!filters.escalatedOnly || project.revisedCost > project.approvedCost)
   ));
   const aggregate = aggregateCost(projects);
+  const series = costTrend(projects);
   const projectBreakdown = projects.map(projectCost).sort((left, right) => (
     (right.absoluteCostEscalation ?? Number.NEGATIVE_INFINITY)
     - (left.absoluteCostEscalation ?? Number.NEGATIVE_INFINITY)
@@ -150,13 +187,13 @@ export function buildMockCostAnalytics(filters: CostAnalyticsFilters = {}): Cost
       expenditureProjects: projects.length,
       physicalProgressProjects: projects.length,
       comparableCostProjects: projects.length,
-      monthlyHistoryProjects: 0,
+      monthlyHistoryProjects: projects.length,
       incompleteCostProjects: 0,
-      latestReportingMonth: null,
+      latestReportingMonth: series.at(-1)?.period ?? null,
     },
-    // A project snapshot is not monthly history. Keep the chart empty instead of
-    // manufacturing a time series from differently dated point-in-time records.
-    series: [],
+    // This series is deterministic demonstration data reconstructed from each
+    // current fixture. The UI labels it as synthetic, never as reported history.
+    series,
     sectorBreakdown: group('sector') as CostAnalyticsResponse['sectorBreakdown'],
     ministryBreakdown: group('ministry') as CostAnalyticsResponse['ministryBreakdown'],
     projectBreakdown,
@@ -165,7 +202,7 @@ export function buildMockCostAnalytics(filters: CostAnalyticsFilters = {}): Cost
   };
 }
 
-function scheduleProject(project: Project): ProjectScheduleBreakdown {
+function scheduleProject(project: Project, updates: ProjectMonthlyUpdate[]): ProjectScheduleBreakdown {
   const asOfDate = project.lastUpdated.slice(0, 10);
   const scheduleSlippageDays = daysBetween(project.originalCompletionDate, project.revisedCompletionDate)
     ?? project.delayDays;
@@ -209,8 +246,11 @@ function scheduleProject(project: Project): ProjectScheduleBreakdown {
     milestoneCompletionPercentage: project.milestones.length
       ? completedMilestones / project.milestones.length * 100
       : null,
-    monthlyProgressVelocity: null,
-    hasMonthlyHistory: false,
+    monthlyProgressVelocity: updates.length > 1
+      ? (updates.at(-1)?.physicalProgress ?? project.physicalProgress)
+        - (updates.at(-2)?.physicalProgress ?? project.physicalProgress)
+      : null,
+    hasMonthlyHistory: updates.length > 1,
     delayRank: null,
   };
 }
@@ -231,7 +271,8 @@ function aggregateSchedule(rows: ProjectScheduleBreakdown[]): ScheduleAggregateB
 
 export function buildMockScheduleAnalytics(filters: ScheduleAnalyticsFilters = {}): ScheduleAnalyticsResponse {
   const query = filters.search?.trim().toLowerCase();
-  let rows = PROJECTS.map(scheduleProject).filter(row => (
+  const historyByProject = new Map(PROJECTS.map(project => [project.id, buildMockProjectHistory(project.id).monthlyUpdates]));
+  let rows = PROJECTS.map(project => scheduleProject(project, historyByProject.get(project.id) ?? [])).filter(row => (
     (!filters.sector || row.sector === filters.sector)
     && (!query || [row.projectId, row.projectName, row.ministry].some(value => value.toLowerCase().includes(query)))
   ));
@@ -270,6 +311,41 @@ export function buildMockScheduleAnalytics(filters: ScheduleAnalyticsFilters = {
   const completedMilestones = rows.reduce((sum, row) => sum + row.completedMilestones, 0);
   const delayed = rows.filter(row => (row.scheduleSlippageDays ?? 0) > 0);
   const latest = rows.length ? [...rows].sort((left, right) => right.asOfDate.localeCompare(left.asOfDate))[0].asOfDate : null;
+  const includedIds = new Set(rows.map(row => row.projectId));
+  const periods = new Map<string, Array<{ update: ProjectMonthlyUpdate; velocity: number | null }>>();
+  for (const [projectId, updates] of historyByProject) {
+    if (!includedIds.has(projectId)) continue;
+    updates.forEach((update, index) => {
+      const previous = updates[index - 1];
+      const velocity = previous?.physicalProgress !== undefined && update.physicalProgress !== undefined
+        ? update.physicalProgress - previous.physicalProgress
+        : null;
+      const period = monthKey(update.reportingMonth);
+      periods.set(period, [...(periods.get(period) ?? []), { update, velocity }]);
+    });
+  }
+  const series: ScheduleAnalyticsResponse['series'] = [...periods.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([period, entries]) => {
+      const updates = entries.map(entry => entry.update);
+      const planned = updates.map(update => update.plannedProgress).filter((value): value is number => value !== undefined);
+      const actual = updates.map(update => update.physicalProgress).filter((value): value is number => value !== undefined);
+      const delays = updates.map(update => update.delayDays).filter((value): value is number => value !== undefined);
+      const velocities = entries.map(entry => entry.velocity).filter((value): value is number => value !== null);
+      const plannedProgress = nullableAverage(planned);
+      const actualProgress = nullableAverage(actual);
+      return {
+        period,
+        reportingProjects: updates.length,
+        plannedProgressProjects: planned.length,
+        actualProgressProjects: actual.length,
+        plannedProgress,
+        actualProgress,
+        progressVariance: plannedProgress === null || actualProgress === null ? null : actualProgress - plannedProgress,
+        monthlyProgressVelocity: nullableAverage(velocities),
+        averageSlippageDays: nullableAverage(delays),
+      };
+    });
   return {
     summary: {
       totalProjects: rows.length,
@@ -302,15 +378,15 @@ export function buildMockScheduleAnalytics(filters: ScheduleAnalyticsFilters = {
       comparableProgressProjects: rows.filter(row => row.plannedPhysicalProgress !== null && row.actualPhysicalProgress !== null).length,
       elapsedDurationProjects: rows.filter(row => row.elapsedDurationPercentage !== null && row.elapsedDurationPercentage !== undefined).length,
       velocityProjects: rows.filter(row => row.monthlyProgressVelocity !== null && row.monthlyProgressVelocity !== undefined).length,
-      monthlyHistoryProjects: 0,
+      monthlyHistoryProjects: rows.filter(row => row.hasMonthlyHistory).length,
       milestoneDetailProjects: rows.filter(row => row.totalMilestones > 0).length,
       milestoneReportingProjects: rows.filter(row => row.totalMilestones > 0).length,
       latestAsOfDate: latest,
-      latestReportingMonth: null,
+      latestReportingMonth: series.at(-1)?.period ?? null,
     },
-    // Demo projects contain current snapshots only, so there is no honest
-    // planned-vs-actual monthly series to draw.
-    series: [],
+    // This is a deterministic reconstruction for demonstration and is labelled
+    // separately from imported CUF reporting history in the interface.
+    series,
     delayBrackets: ['On Schedule (0d)', '1-12 Months', '13-24 Months', '25-60 Months', '> 5 Years']
       .map((bracket, index) => ({ bracket, projectCount: counts[index], sortOrder: index + 1 })),
     sectorBreakdown: grouped('sector') as ScheduleAnalyticsResponse['sectorBreakdown'],

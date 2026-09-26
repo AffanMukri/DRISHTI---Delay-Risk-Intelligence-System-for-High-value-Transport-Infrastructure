@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, FlaskConical, Info, RotateCcw, Sparkles } from 'lucide-react';
 import type { ScenarioConfiguration, ScenarioOutcome, ScenarioSimulation } from '../types';
 import { ScenarioService } from '../services/scenarioService';
+import {
+  buildMockScenarioConfiguration,
+  simulateMockScenario,
+} from '../services/mockProjectIntelligence';
 import { ErrorState, LoadingState, formatCrore, formatDate } from './ui';
 
 interface WhatIfSimulatorProps {
@@ -26,7 +30,7 @@ function displayValue(value: unknown): string {
   return String(value).replaceAll('_', ' ');
 }
 
-function OutcomeColumn({ title, outcome, accent }: { title: string; outcome: ScenarioOutcome; accent: string }) {
+function OutcomeColumn({ title, outcome, accent, demo = false }: { title: string; outcome: ScenarioOutcome; accent: string; demo?: boolean }) {
   return (
     <div className={`rounded border ${accent} overflow-hidden`}>
       <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200">
@@ -34,12 +38,12 @@ function OutcomeColumn({ title, outcome, accent }: { title: string; outcome: Sce
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-0 divide-y sm:divide-y-0 sm:divide-x lg:divide-x-0 lg:divide-y divide-slate-200">
         <div className="p-4">
-          <p className="text-2xs uppercase tracking-wide text-slate-500">Hybrid risk</p>
+          <p className="text-2xs uppercase tracking-wide text-slate-500">{demo ? 'Deterministic risk' : 'Hybrid risk'}</p>
           <p className="text-2xl font-bold text-navy-800 tabular-nums mt-1">{outcome.risk.overallScore.toFixed(0)}/100</p>
           <p className="text-xs text-slate-500">{riskLabels[outcome.risk.riskLevel]}</p>
         </div>
         <div className="p-4">
-          <p className="text-2xs uppercase tracking-wide text-slate-500">Predicted delay</p>
+          <p className="text-2xs uppercase tracking-wide text-slate-500">{demo ? 'Estimated delay' : 'Predicted delay'}</p>
           <p className="text-2xl font-bold text-navy-800 tabular-nums mt-1">{outcome.schedule.expectedDelayDays.toLocaleString()} days</p>
           <p className="text-xs text-slate-500">
             {outcome.schedule.scheduleOverrunProbability == null ? 'Probability unavailable' : `${(outcome.schedule.scheduleOverrunProbability * 100).toFixed(1)}% overrun probability`}
@@ -47,7 +51,7 @@ function OutcomeColumn({ title, outcome, accent }: { title: string; outcome: Sce
           <p className="text-2xs text-slate-400">Completion {formatDate(outcome.schedule.predictedCompletionDate)}</p>
         </div>
         <div className="p-4">
-          <p className="text-2xs uppercase tracking-wide text-slate-500">Predicted cost escalation</p>
+          <p className="text-2xs uppercase tracking-wide text-slate-500">{demo ? 'Estimated cost escalation' : 'Predicted cost escalation'}</p>
           <p className="text-xl font-bold text-navy-800 tabular-nums mt-1">{formatCrore(outcome.cost.predictedEscalationAmount)}</p>
           <p className="text-xs text-slate-500">{outcome.cost.predictedEscalationPercentage >= 0 ? '+' : ''}{outcome.cost.predictedEscalationPercentage.toFixed(1)}%</p>
           <p className="text-2xs text-slate-400">{outcome.cost.significantOverrunProbability == null ? 'Probability unavailable' : `${(outcome.cost.significantOverrunProbability * 100).toFixed(1)}% significant-overrun probability`}</p>
@@ -71,7 +75,16 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
     setConfiguration(null);
     setResult(null);
     setError(null);
-    if (!backendEnabled) return;
+    if (!backendEnabled) {
+      const config = buildMockScenarioConfiguration(projectId);
+      setConfiguration(config);
+      setValues(Object.fromEntries(config.supportedVariables.map(variable => [
+        variable.code,
+        variable.currentValue == null ? '' : String(variable.currentValue),
+      ])));
+      setLoading(false);
+      return;
+    }
     const controller = new AbortController();
     setLoading(true);
     void ScenarioService.configuration(projectId, controller.signal)
@@ -118,7 +131,9 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
     setRunning(true);
     setError(null);
     try {
-      setResult(await ScenarioService.simulate(projectId, changes, assumptionNote));
+      setResult(backendEnabled
+        ? await ScenarioService.simulate(projectId, changes, assumptionNote)
+        : simulateMockScenario(projectId, changes, assumptionNote));
     } catch (simulationError) {
       setError(simulationError instanceof Error ? simulationError.message : 'The scenario could not be calculated.');
     } finally {
@@ -126,9 +141,6 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
     }
   };
 
-  if (!backendEnabled) {
-    return <div className="rounded border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">What-if model inference is unavailable while using the explicit mock data source.</div>;
-  }
   if (loading) return <LoadingState message="Loading active-model scenario inputs..." />;
   if (error && !configuration) return <ErrorState title="Simulator unavailable" description={error} onRetry={() => setVersion(value => value + 1)} />;
   if (!configuration) return null;
@@ -138,8 +150,12 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
       <div className="rounded border border-purple-200 bg-purple-50 p-3 flex items-start gap-2 text-xs text-purple-900">
         <FlaskConical className="w-4 h-4 shrink-0 mt-0.5" />
         <div>
-          <p className="font-semibold">Temporary model scenario — no project data is updated</p>
-          <p className="text-slate-600 mt-0.5">Only variables used by the active trained cost or schedule model are available. Baseline and scenario use the same model versions.</p>
+          <p className="font-semibold">Temporary {configuration.methodology === 'deterministic_demo' ? 'demonstration' : 'model'} scenario — no project data is updated</p>
+          <p className="text-slate-600 mt-0.5">
+            {configuration.methodology === 'deterministic_demo'
+              ? 'Demo mode applies documented deterministic equations to supported project fields. It does not run or imitate a trained ML model.'
+              : 'Only variables used by the active trained cost or schedule model are available. Baseline and scenario use the same model versions.'}
+          </p>
         </div>
       </div>
 
@@ -196,7 +212,7 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
       {error && <ErrorState title="Scenario calculation failed" description={error} />}
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <p className="text-2xs text-slate-500">Active models: cost {configuration.modelVersions.cost} · schedule {configuration.modelVersions.schedule}</p>
+        <p className="text-2xs text-slate-500">{configuration.methodology === 'deterministic_demo' ? 'Active demo rules' : 'Active models'}: cost {configuration.modelVersions.cost} · schedule {configuration.modelVersions.schedule}</p>
         <div className="flex gap-2">
           <button type="button" className="btn btn-secondary btn-sm" onClick={reset} disabled={running}>
             <RotateCcw className="w-3.5 h-3.5" /> Reset
@@ -212,8 +228,8 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
       {result && !running && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <OutcomeColumn title="BEFORE" outcome={result.before} accent="border-slate-300" />
-            <OutcomeColumn title="SCENARIO" outcome={result.scenario} accent="border-purple-300" />
+            <OutcomeColumn title="BEFORE" outcome={result.before} accent="border-slate-300" demo={result.methodology === 'deterministic_demo'} />
+            <OutcomeColumn title="SCENARIO" outcome={result.scenario} accent="border-purple-300" demo={result.methodology === 'deterministic_demo'} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -235,10 +251,10 @@ export function WhatIfSimulator({ projectId, backendEnabled }: WhatIfSimulatorPr
                 {result.explanation.driverChanges.slice(0, 4).map(driver => (
                   <div key={`${driver.model}-${driver.feature}`} className="text-2xs text-slate-500 border-t border-slate-100 pt-2">
                     <strong className="text-slate-700">{driver.model.toUpperCase()} · {driver.featureLabel}:</strong>{' '}
-                    SHAP contribution {driver.contributionChange >= 0 ? '+' : ''}{driver.contributionChange.toFixed(2)} {driver.contributionUnit.replaceAll('_', ' ')}
+                    {result.methodology === 'deterministic_demo' ? 'Rule contribution' : 'SHAP contribution'} {driver.contributionChange >= 0 ? '+' : ''}{driver.contributionChange.toFixed(2)} {driver.contributionUnit.replaceAll('_', ' ')}
                   </div>
                 ))}
-                {!result.explanation.driverChanges.length && <p className="text-2xs text-slate-500">SHAP contribution differences were unavailable; outcome deltas above remain direct model outputs.</p>}
+                {!result.explanation.driverChanges.length && <p className="text-2xs text-slate-500">{result.explanation.numericalSource}</p>}
               </div>
             </div>
           </div>

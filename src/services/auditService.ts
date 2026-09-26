@@ -1,4 +1,7 @@
 import { apiClient } from '../lib/apiClient';
+import { listMockAuditLogs, mockAuditOptions, recordMockSecurityEvent } from './mockAudit';
+
+const USE_MOCK_AUDIT = import.meta.env.VITE_DATA_SOURCE === 'mock';
 
 export interface AuditActor {
   id?: string | null;
@@ -73,14 +76,20 @@ function queryString(filters: AuditFilters): string {
 
 export const AuditService = {
   list(filters: AuditFilters, signal?: AbortSignal): Promise<AuditLogResponse> {
+    if (USE_MOCK_AUDIT) return Promise.resolve(listMockAuditLogs(filters));
     return apiClient.get<AuditLogResponse>(`/audit/logs${queryString(filters)}`, { signal });
   },
 
   options(signal?: AbortSignal): Promise<AuditFilterOptions> {
+    if (USE_MOCK_AUDIT) return Promise.resolve(mockAuditOptions());
     return apiClient.get<AuditFilterOptions>('/audit/options', { signal });
   },
 
   async securityEvent(action: 'login_success' | 'logout_requested'): Promise<void> {
+    if (USE_MOCK_AUDIT) {
+      recordMockSecurityEvent(action);
+      return;
+    }
     await apiClient.post('/audit/security-events', {
       action,
       metadata: { client: 'drishti-web' },

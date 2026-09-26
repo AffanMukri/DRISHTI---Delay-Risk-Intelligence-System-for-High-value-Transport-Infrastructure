@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowDown, BrainCircuit, Database, FileWarning, GitBranch, Lightbulb, Zap } from 'lucide-react';
 import type { EvidenceNode, EvidenceStage, EvidenceSubjectType, ProjectEvidenceChain } from '../types';
 import { EvidenceService } from '../services/evidenceService';
+import { buildMockEvidenceChain } from '../services/mockProjectIntelligence';
 import { EmptyState, ErrorState, LoadingState, Modal, formatDate } from './ui';
 
 interface EvidenceChainModalProps {
@@ -86,11 +87,14 @@ export function EvidenceChainModal({ isOpen, projectId, onClose, preferredSubjec
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    if (!isOpen || !backendEnabled) return;
+    if (!isOpen) return;
     const controller = new AbortController();
     setLoading(true);
     setError(null);
-    void EvidenceService.getForProject(projectId, controller.signal)
+    const request = backendEnabled
+      ? EvidenceService.getForProject(projectId, controller.signal)
+      : Promise.resolve(buildMockEvidenceChain(projectId));
+    void request
       .then(result => {
         setData(result);
         const preferred = result.chains.find(chain => (
@@ -118,7 +122,6 @@ export function EvidenceChainModal({ isOpen, projectId, onClose, preferredSubjec
     <Modal isOpen={isOpen} onClose={onClose} title="Evidence Chain" size="lg">
       {loading && <LoadingState message="Tracing stored source, model, warning, and intervention records..." />}
       {!loading && error && <ErrorState title="Evidence unavailable" description={error} onRetry={() => setVersion(value => value + 1)} />}
-      {!loading && !error && !backendEnabled && <EmptyState title="Evidence unavailable in mock mode" description="Evidence chains require persisted backend records and are never fabricated from frontend mock data." />}
       {!loading && !error && data && !data.chains.length && <EmptyState title="No evidence chains" description="No persisted major risk, genuine prediction, or High/Critical warning is available for this project." />}
       {!loading && !error && data && selected && (
         <div className="space-y-4">

@@ -39,6 +39,10 @@ import { WhatIfSimulator } from '../components/WhatIfSimulator';
 import { EvidenceChainModal } from '../components/EvidenceChainModal';
 import { AskPragatiX } from '../components/AskPragatiX';
 import { PublicProjectQr } from '../components/PublicProjectQr';
+import {
+  buildMockCostProjection,
+  buildMockScheduleProjection,
+} from '../services/mockProjectIntelligence';
 
 const MilestoneDependencyGraph = lazy(() => import('../components/MilestoneDependencyGraph').then(module => ({
   default: module.MilestoneDependencyGraph,
@@ -94,7 +98,12 @@ export default function ProjectIntelligence() {
   useEffect(() => {
     setCostPrediction(null);
     setPredictionError(null);
-    if (!selectedProjectId || !USE_BACKEND_DATA || !hasPermission('view_predictions')) return;
+    if (!selectedProjectId || !hasPermission('view_predictions')) return;
+    if (!USE_BACKEND_DATA) {
+      setCostPrediction(buildMockCostProjection(selectedProjectId));
+      setPredictionLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
     setPredictionLoading(true);
@@ -114,7 +123,12 @@ export default function ProjectIntelligence() {
   useEffect(() => {
     setSchedulePrediction(null);
     setSchedulePredictionError(null);
-    if (!selectedProjectId || !USE_BACKEND_DATA || !hasPermission('view_predictions')) return;
+    if (!selectedProjectId || !hasPermission('view_predictions')) return;
+    if (!USE_BACKEND_DATA) {
+      setSchedulePrediction(buildMockScheduleProjection(selectedProjectId));
+      setSchedulePredictionLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
     setSchedulePredictionLoading(true);
@@ -610,10 +624,11 @@ export default function ProjectIntelligence() {
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Trained Schedule Overrun Model</p>
+                  <p className="text-sm font-semibold text-slate-700">{schedulePrediction?.synthetic ? 'Deterministic Demo Schedule Projection' : 'Trained Schedule Overrun Model'}</p>
                   <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-                    Independent from the cost model. It predicts completion variance and schedule-overrun probability
-                    from monitoring information available at the dated project snapshot.
+                    {schedulePrediction?.synthetic
+                      ? 'A transparent rule projection derived from the synthetic project snapshot. No trained model, probability, or SHAP value is presented.'
+                      : 'Independent from the cost model. It predicts completion variance and schedule-overrun probability from monitoring information available at the dated project snapshot.'}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -650,6 +665,11 @@ export default function ProjectIntelligence() {
 
               {schedulePrediction && !schedulePredictionLoading && (
                 <div className="space-y-4">
+                  {schedulePrediction.synthetic && (
+                    <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                      <strong>Demonstration estimate:</strong> Values below use documented deterministic rules and synthetic project data. They are not trained-model results or guaranteed outcomes.
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
                       <p className="text-2xs uppercase tracking-wide text-slate-500">Schedule overrun probability</p>
@@ -661,14 +681,14 @@ export default function ProjectIntelligence() {
                       <p className="text-2xs text-slate-400 mt-1">Threshold: &gt; {schedulePrediction.scheduleOverrunThresholdDays} days</p>
                     </div>
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
-                      <p className="text-2xs uppercase tracking-wide text-slate-500">Expected delay</p>
+                      <p className="text-2xs uppercase tracking-wide text-slate-500">{schedulePrediction.synthetic ? 'Estimated delay' : 'Expected delay'}</p>
                       <p className={`text-2xl font-bold tabular-nums mt-1 ${schedulePrediction.expectedDelayDays > 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {schedulePrediction.expectedDelayDays.toLocaleString()} days
                       </p>
                       <p className="text-2xs text-slate-400 mt-1">Signed variance: {schedulePrediction.predictedCompletionVarianceDays} days</p>
                     </div>
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
-                      <p className="text-2xs uppercase tracking-wide text-slate-500">Predicted completion</p>
+                      <p className="text-2xs uppercase tracking-wide text-slate-500">{schedulePrediction.synthetic ? 'Estimated completion' : 'Predicted completion'}</p>
                       <p className="text-lg font-bold text-navy-800 mt-1">{formatDate(schedulePrediction.predictedCompletionDate)}</p>
                       <p className="text-2xs text-slate-400 mt-1">Original: {formatDate(schedulePrediction.originalCompletionDate)}</p>
                     </div>
@@ -685,9 +705,9 @@ export default function ProjectIntelligence() {
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
                         <p className="text-sm font-semibold text-slate-700">Planned vs actual vs predicted progress</p>
-                        <p className="text-2xs text-slate-500 mt-0.5">Solid blue is observed actual data; grey is reported plan; purple dashes are the implied path to the model-predicted completion date.</p>
+                        <p className="text-2xs text-slate-500 mt-0.5">Solid blue is observed demo data; grey is the demo plan; purple dashes are the implied path to the {schedulePrediction.synthetic ? 'deterministic estimated' : 'model-predicted'} completion date.</p>
                       </div>
-                      <span className="badge badge-neutral text-2xs">Prediction clearly separated</span>
+                      <span className="badge badge-neutral text-2xs">{schedulePrediction.synthetic ? 'Demo estimate clearly separated' : 'Prediction clearly separated'}</span>
                     </div>
                     <ResponsiveContainer width="100%" height={250}>
                       <AreaChart data={schedulePredictionTrend} margin={{ top: 4, right: 8, bottom: 0, left: -10 }}>
@@ -702,7 +722,7 @@ export default function ProjectIntelligence() {
                       </AreaChart>
                     </ResponsiveContainer>
                     <p className="text-2xs text-slate-500 mt-2">
-                      The purple progress path is linear interpolation from the last actual snapshot to the model-predicted completion date. It is not a separately trained monthly-progress forecast.
+                      The purple progress path is linear interpolation from the latest snapshot to the {schedulePrediction.synthetic ? 'deterministic estimated' : 'model-predicted'} completion date. It is not a separately trained monthly-progress forecast.
                     </p>
                   </div>
 
@@ -715,14 +735,14 @@ export default function ProjectIntelligence() {
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="border border-slate-200 rounded p-4">
-                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Model provenance</p>
-                      <MetricRow label="Model version" value={schedulePrediction.modelVersion} />
-                      <MetricRow label="Regression model" value={schedulePrediction.regressionModel.replaceAll('_', ' ')} />
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">{schedulePrediction.synthetic ? 'Projection provenance' : 'Model provenance'}</p>
+                      <MetricRow label={schedulePrediction.synthetic ? 'Rule version' : 'Model version'} value={schedulePrediction.modelVersion} />
+                      <MetricRow label={schedulePrediction.synthetic ? 'Projection method' : 'Regression model'} value={schedulePrediction.regressionModel.replaceAll('_', ' ')} />
                       <MetricRow label="Classification model" value={schedulePrediction.classificationModel?.replaceAll('_', ' ') ?? 'Omitted — insufficient class support'} />
                       <MetricRow label="Snapshot date" value={formatDate(schedulePrediction.asOfDate)} />
                     </div>
                     <div className="border border-slate-200 rounded p-4">
-                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Held-out test metrics</p>
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">{schedulePrediction.synthetic ? 'Model evaluation not applicable' : 'Held-out test metrics'}</p>
                       <MetricRow label="MAE" value={schedulePrediction.evaluationMetrics.regression?.test?.mae_days == null ? 'Unavailable' : `${schedulePrediction.evaluationMetrics.regression.test.mae_days.toFixed(1)} days`} />
                       <MetricRow label="RMSE" value={schedulePrediction.evaluationMetrics.regression?.test?.rmse_days == null ? 'Unavailable' : `${schedulePrediction.evaluationMetrics.regression.test.rmse_days.toFixed(1)} days`} />
                       <MetricRow label="R²" value={schedulePrediction.evaluationMetrics.regression?.test?.r2?.toFixed(3) ?? 'Unavailable'} />
@@ -740,10 +760,11 @@ export default function ProjectIntelligence() {
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Trained Cost Overrun Model</p>
+                  <p className="text-sm font-semibold text-slate-700">{costPrediction?.synthetic ? 'Deterministic Demo Cost Projection' : 'Trained Cost Overrun Model'}</p>
                   <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-                    Uses the active, versioned model trained on non-demo completed-project history. No deterministic
-                    risk score or mock value is substituted when a trained model is unavailable.
+                    {costPrediction?.synthetic
+                      ? 'A transparent rule projection derived from the synthetic project snapshot. No trained model, probability, or SHAP value is presented.'
+                      : 'Uses the active, versioned model trained on non-demo completed-project history. No deterministic risk score or mock value is substituted when a trained model is unavailable.'}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -787,6 +808,11 @@ export default function ProjectIntelligence() {
 
               {costPrediction && !predictionLoading && (
                 <div className="space-y-4">
+                  {costPrediction.synthetic && (
+                    <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                      <strong>Demonstration estimate:</strong> Values below use documented deterministic rules and synthetic project data. They are not trained-model results or guaranteed outcomes.
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
                       <p className="text-2xs uppercase tracking-wide text-slate-500">Significant overrun probability</p>
@@ -803,7 +829,7 @@ export default function ProjectIntelligence() {
                       </p>
                     </div>
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
-                      <p className="text-2xs uppercase tracking-wide text-slate-500">Predicted final cost</p>
+                      <p className="text-2xs uppercase tracking-wide text-slate-500">{costPrediction.synthetic ? 'Estimated final cost' : 'Predicted final cost'}</p>
                       <p className="text-2xl font-bold text-navy-800 tabular-nums mt-1">
                         {formatCrore(costPrediction.predictedFinalCost)}
                       </p>
@@ -812,7 +838,7 @@ export default function ProjectIntelligence() {
                       </p>
                     </div>
                     <div className="p-4 rounded border border-slate-200 bg-slate-50">
-                      <p className="text-2xs uppercase tracking-wide text-slate-500">Predicted escalation</p>
+                      <p className="text-2xs uppercase tracking-wide text-slate-500">{costPrediction.synthetic ? 'Estimated escalation' : 'Predicted escalation'}</p>
                       <p className={`text-2xl font-bold tabular-nums mt-1 ${costPrediction.predictedEscalationAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {formatCrore(costPrediction.predictedEscalationAmount)}
                       </p>
@@ -838,15 +864,15 @@ export default function ProjectIntelligence() {
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="border border-slate-200 rounded p-4">
-                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Model provenance</p>
-                      <MetricRow label="Model version" value={costPrediction.modelVersion} />
-                      <MetricRow label="Regression model" value={costPrediction.regressionModel.replaceAll('_', ' ')} />
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">{costPrediction.synthetic ? 'Projection provenance' : 'Model provenance'}</p>
+                      <MetricRow label={costPrediction.synthetic ? 'Rule version' : 'Model version'} value={costPrediction.modelVersion} />
+                      <MetricRow label={costPrediction.synthetic ? 'Projection method' : 'Regression model'} value={costPrediction.regressionModel.replaceAll('_', ' ')} />
                       <MetricRow label="Classification model" value={costPrediction.classificationModel?.replaceAll('_', ' ') ?? 'Omitted — insufficient class support'} />
                       <MetricRow label="Snapshot date" value={formatDate(costPrediction.asOfDate)} />
                       <MetricRow label="Generated" value={formatDate(costPrediction.generatedAt)} />
                     </div>
                     <div className="border border-slate-200 rounded p-4">
-                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Held-out test metrics</p>
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">{costPrediction.synthetic ? 'Model evaluation not applicable' : 'Held-out test metrics'}</p>
                       <MetricRow label="MAE" value={costPrediction.evaluationMetrics.regression?.test?.mae?.toFixed(2) ?? 'Unavailable'} />
                       <MetricRow label="RMSE" value={costPrediction.evaluationMetrics.regression?.test?.rmse?.toFixed(2) ?? 'Unavailable'} />
                       <MetricRow label="R²" value={costPrediction.evaluationMetrics.regression?.test?.r2?.toFixed(3) ?? 'Unavailable'} />
@@ -856,9 +882,9 @@ export default function ProjectIntelligence() {
                   </div>
 
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
-                    This is a statistical estimate from model version {costPrediction.modelVersion}, not a certified
-                    revised cost. The uncertainty band is the 90th percentile validation error and is explicitly not
-                    a calibrated confidence interval.
+                    {costPrediction.synthetic
+                      ? `This is a deterministic synthetic demonstration estimate from rule version ${costPrediction.modelVersion}, not a trained prediction or certified revised cost. The range is a sensitivity band, not a confidence interval.`
+                      : `This is a statistical estimate from model version ${costPrediction.modelVersion}, not a certified revised cost. The uncertainty band is the 90th percentile validation error and is explicitly not a calibrated confidence interval.`}
                   </div>
                 </div>
               )}

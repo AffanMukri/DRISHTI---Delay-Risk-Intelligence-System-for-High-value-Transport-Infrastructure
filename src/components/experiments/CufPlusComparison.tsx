@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Database, GitCompareArrows, Play, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import {
+  buildMockExperimentReadiness,
   ExperimentService,
   type ExperimentMetricDelta,
   type ModelComparisonExperiment,
@@ -81,7 +82,7 @@ function ExperimentResults({ experiment }: { experiment: ModelComparisonExperime
 
 export function CufPlusComparison() {
   const { hasPermission } = useAuth();
-  const [experiment, setExperiment] = useState<ModelComparisonExperiment | null>(null);
+  const [experiment, setExperiment] = useState<ModelComparisonExperiment | null>(() => mockMode ? buildMockExperimentReadiness() : null);
   const [loading, setLoading] = useState(!mockMode);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,7 +121,8 @@ export function CufPlusComparison() {
       <div className="flex gap-2">{!mockMode && <button onClick={retry} className="btn btn-secondary btn-sm" disabled={loading || running}><RefreshCw className="w-3 h-3 mr-1" />Refresh</button>}{!mockMode && hasPermission('analyse_data') && <button onClick={() => void run()} className="btn btn-primary btn-sm" disabled={loading || running}><Play className="w-3 h-3 mr-1" />{running ? 'Running…' : 'Run experiment'}</button>}</div>
     </div>
     <div className="p-5">
-      {mockMode ? <EmptyState title="Database experiment unavailable in mock mode" description="Switch to backend data and load validated, source-attributed external observations. Demo values are never used for this comparison." /> : loading && !experiment ? <LoadingState message="Loading measured experiment metadata…" /> : error && !experiment ? <ErrorState description={error} onRetry={retry} /> : experiment ? <><>{error && <div className="mb-3 p-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-800">{error}</div>}</><ExperimentResults experiment={experiment} /></> : <EmptyState title="No experiment has been run" description="Register and validate external observations, then run an immutable comparison version. Insufficient coverage will be reported without a Model B claim." />}
+      {mockMode && <div className="mb-4 rounded border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900"><strong>Experiment-readiness view:</strong> this panel lists the CUF baseline and legitimate external-feature candidates, while preserving zero coverage and omitting metrics until validated observations exist.</div>}
+      {loading && !experiment ? <LoadingState message="Loading measured experiment metadata…" /> : error && !experiment ? <ErrorState description={error} onRetry={retry} /> : experiment ? <><>{error && <div className="mb-3 p-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-800">{error}</div>}</><ExperimentResults experiment={experiment} /></> : <EmptyState title="No experiment has been run" description="Register and validate external observations, then run an immutable comparison version. Insufficient coverage will be reported without a Model B claim." />}
     </div>
   </div>;
 }

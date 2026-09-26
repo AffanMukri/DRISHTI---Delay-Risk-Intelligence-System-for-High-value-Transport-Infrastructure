@@ -71,11 +71,18 @@ export function RiskTrajectoryPanel({ trajectory, loading = false, error, onRetr
   const latest = trajectory.points.at(-1)!;
   return (
     <div className="space-y-5">
+      {trajectory.provenance === 'synthetic_demo_reconstruction' && (
+        <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+          <strong>Synthetic demonstration trajectory:</strong> {trajectory.methodology}
+        </div>
+      )}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-navy-800">Monthly Risk Trajectory</p>
           <p className="text-xs text-slate-500 mt-0.5">
-            One latest persisted assessment per reporting month. Dashed markers indicate meaningful increases.
+            {trajectory.provenance === 'synthetic_demo_reconstruction'
+              ? 'Reconstructed synthetic monthly points derived from the current demo snapshot; they are not persisted official history.'
+              : 'One latest persisted assessment per reporting month. Dashed markers indicate meaningful increases.'}
           </p>
         </div>
         <div className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs font-semibold ${trendStyle[trajectory.trendDirection]}`}>
@@ -219,7 +226,7 @@ function ChangeInspection({ change }: { change: RiskTrajectoryChange }) {
         <div className="rounded bg-slate-50 p-2"><span className="text-slate-500">Implementation</span><p className="font-semibold">{signed(change.implementationRiskChange)}</p></div>
       </div>
       <div>
-        <p className="text-xs font-semibold text-slate-700 mb-2">Stored driver changes</p>
+        <p className="text-xs font-semibold text-slate-700 mb-2">Driver changes</p>
         {change.driverChanges.length ? (
           <div className="space-y-2 max-h-36 overflow-y-auto">
             {change.driverChanges.map(driver => (

@@ -18,6 +18,11 @@ import type {
   Warning,
 } from '../types';
 import type { AnalyticsKind, ProjectDataService, ProjectFilters, ProjectsResult } from './contracts';
+import {
+  buildMockDataConfidence,
+  buildMockProjectHistory,
+  buildMockRiskTrajectory,
+} from './mockProjectIntelligence';
 
 function applyProjectFilters(filters: ProjectFilters): Project[] {
   let data = [...PROJECTS];
@@ -65,28 +70,11 @@ export class MockProjectService implements ProjectDataService {
   }
 
   async getProjectHistory(id: string): Promise<ProjectHistory> {
-    const project = PROJECTS.find(item => item.id === id);
-    return {
-      projectId: id,
-      monthlyUpdates: project ? [{
-        reportingMonth: project.lastUpdated.slice(0, 10),
-        approvedCost: project.approvedCost,
-        revisedCost: project.revisedCost,
-        expenditure: project.expenditure,
-        physicalProgress: project.physicalProgress,
-        plannedProgress: project.expectedProgress,
-        financialProgress: project.financialProgress,
-        delayDays: project.delayDays,
-        clearanceStatus: {},
-        issues: [],
-      }] : [],
-      costHistory: [],
-      scheduleHistory: [],
-    };
+    return buildMockProjectHistory(id);
   }
 
-  async getDataConfidence(): Promise<DataConfidence | null> {
-    return null;
+  async getDataConfidence(id: string): Promise<DataConfidence | null> {
+    return buildMockDataConfidence(id);
   }
 
   async getPortfolioSummary(): Promise<PortfolioSummary> {
@@ -132,18 +120,7 @@ export class MockProjectService implements ProjectDataService {
   }
 
   async getRiskTrajectory(projectId: string): Promise<RiskTrajectory> {
-    return {
-      projectId,
-      trendDirection: 'Stable',
-      points: [],
-      changes: [],
-      totalMonths: 0,
-      thresholds: {
-        stableBandPoints: 2,
-        meaningfulIncreasePoints: 5,
-        rapidIncreasePoints: 10,
-      },
-    };
+    return buildMockRiskTrajectory(projectId);
   }
 
   async assessPortfolioRisks(): Promise<RiskAssessment[]> {

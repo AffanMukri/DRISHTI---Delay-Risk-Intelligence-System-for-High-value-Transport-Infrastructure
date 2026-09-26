@@ -415,6 +415,30 @@ try {
       await navigateFromSidebar(groupLabel, navigationLabel);
     }
     await page.getByRole('heading', { name: heading, exact: true }).waitFor({ state: 'visible' });
+    if (navigationLabel === 'Cost Analytics') {
+      await page.getByText('Synthetic demo history', { exact: true }).waitFor({ state: 'visible' });
+      await page.getByText('No monthly cost history', { exact: true }).waitFor({ state: 'detached' });
+    }
+    if (navigationLabel === 'Schedule Analytics') {
+      await page.getByText('Synthetic demo history', { exact: true }).waitFor({ state: 'visible' });
+      await page.getByRole('heading', { name: 'Deterministic Demo Schedule Projection', exact: true }).waitFor({ state: 'visible' });
+      await page.getByText('Synthetic demonstration projection:', { exact: false }).waitFor({ state: 'visible' });
+    }
+    if (navigationLabel === 'Project Insights') {
+      await page.getByText('Experiment-readiness view:', { exact: false }).waitFor({ state: 'visible' });
+      await page.getByText('Weather disruption days', { exact: true }).waitFor({ state: 'visible' });
+      await page.getByText('No Model B performance claim was produced.', { exact: false }).waitFor({ state: 'visible' });
+    }
+    if (navigationLabel === 'Audit Trail') {
+      await page.getByText('Synthetic demonstration audit:', { exact: false }).waitFor({ state: 'visible' });
+      await page.getByText('18 events', { exact: true }).waitFor({ state: 'visible' });
+      await page.getByText('Your session is unavailable.', { exact: false }).waitFor({ state: 'detached' });
+      await page.getByLabel('Audit action filter').selectOption('warning_acknowledged');
+      await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
+      await page.getByText('2 events', { exact: true }).waitFor({ state: 'visible' });
+      await page.getByRole('button', { name: 'Clear', exact: true }).click();
+      await page.getByText('18 events', { exact: true }).waitFor({ state: 'visible' });
+    }
     if (navigationLabel === 'Geo Intelligence') {
       await page.getByRole('img', { name: 'Reference map of India with project markers plotted from stored coordinates' }).waitFor({ state: 'visible' });
       await page.getByRole('button', { name: 'Enable interactive GIS' }).waitFor({ state: 'visible' });
@@ -443,13 +467,13 @@ try {
   await page.locator('table.data-table tbody tr').first().click();
   await page.getByText('Project Health Score', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Timeline & Milestones', { exact: true }).click();
-  await page.getByText('Dependency graph requires backend data', { exact: true }).waitFor({ state: 'visible' });
+  await page.getByText('Dependency & Risk Propagation', { exact: true }).waitFor({ state: 'visible' });
   await page.getByRole('button', { name: /Ask DRISHTI/ }).click();
   await page.getByText('Ask DRISHTI requires the authenticated FastAPI data source. It does not generate answers from mock project data.', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Cost Prediction', { exact: true }).click();
-  await page.getByText('Real model inference is unavailable while the application is using the explicit offline mock data source.', { exact: true }).waitFor({ state: 'visible' });
+  await page.getByText('Deterministic Demo Cost Projection', { exact: true }).waitFor({ state: 'visible' });
   await page.getByText('Schedule Prediction', { exact: true }).click();
-  await page.getByText('No real schedule model result loaded', { exact: true }).waitFor({ state: 'visible' });
+  await page.getByText('Deterministic Demo Schedule Projection', { exact: true }).waitFor({ state: 'visible' });
   verified.push('Project Intelligence');
 
   if (runtimeErrors.length) {

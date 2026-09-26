@@ -118,7 +118,7 @@ export default function CostAnalytics() {
         <div className="flex-1">
           <p className="font-semibold">Cost data availability</p>
           <p className="mt-0.5">
-            {availability.comparableCostProjects} of {availability.totalProjects} projects have comparable approved and revised costs; {availability.monthlyHistoryProjects} include monthly history.
+            {availability.comparableCostProjects} of {availability.totalProjects} projects have comparable approved and revised costs; {availability.monthlyHistoryProjects} include {USE_BACKEND_DATA ? 'monthly history' : 'reconstructed demonstration history'}.
             {availability.incompleteCostProjects > 0 && ` ${availability.incompleteCostProjects} projects are excluded from escalation calculations because a required cost value is unavailable.`}
           </p>
           <p className="text-2xs mt-1 opacity-80">
@@ -179,7 +179,7 @@ export default function CostAnalytics() {
       </div>
 
       <div className="card">
-        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Historical Monthly Cost Trend</h2><p className="text-xs text-slate-500 mt-0.5">Monthly reported values; coverage may differ by reporting period</p></div><Badge variant={availability.monthlyHistoryProjects ? 'info' : 'neutral'}>{availability.monthlyHistoryProjects ? 'Database history' : 'Awaiting monthly records'}</Badge></div>
+        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Historical Monthly Cost Trend</h2><p className="text-xs text-slate-500 mt-0.5">{USE_BACKEND_DATA ? 'Monthly reported values; coverage may differ by reporting period' : 'Deterministically reconstructed synthetic trend from current demo snapshots; not reported government history'}</p></div><Badge variant={availability.monthlyHistoryProjects ? 'info' : 'neutral'}>{availability.monthlyHistoryProjects ? (USE_BACKEND_DATA ? 'Database history' : 'Synthetic demo history') : 'Awaiting monthly records'}</Badge></div>
         <div className="card-body">
           {trend.length ? <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={trend} margin={{ top: 10, right: 12, bottom: 0, left: 5 }}>
@@ -197,12 +197,12 @@ export default function CostAnalytics() {
       </div>
 
       <div className="card">
-        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Top 10 High-Escalation Projects</h2><p className="text-xs text-slate-500 mt-0.5">Highest absolute escalation from {data.projectBreakdown.length} backend project-level records</p></div></div>
+        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Top 10 High-Escalation Projects</h2><p className="text-xs text-slate-500 mt-0.5">Highest absolute escalation from {data.projectBreakdown.length} {USE_BACKEND_DATA ? 'backend' : 'demonstration'} project-level records</p></div></div>
         <div className="overflow-x-auto">
           <table className="data-table"><thead><tr><th>Project</th><th>Ministry / Sector</th><th>Original Approved</th><th>Latest Revised</th><th>Escalation</th><th>Escalation %</th><th>Expenditure Rate</th><th>Action</th></tr></thead>
             <tbody>
               {data.breakdown.map(project => <tr key={project.projectId} onClick={() => navigate('project-intelligence', project.projectId)}>
-                <td><span className="font-semibold text-navy-900 block text-xs">{project.projectName}</span><span className="text-2xs text-slate-400">{project.projectId}{project.hasMonthlyHistory ? ' · Monthly history' : ' · Snapshot only'}</span></td>
+                <td><span className="font-semibold text-navy-900 block text-xs">{project.projectName}</span><span className="text-2xs text-slate-400">{project.projectId}{project.hasMonthlyHistory ? (USE_BACKEND_DATA ? ' · Monthly history' : ' · Synthetic demo trend') : ' · Snapshot only'}</span></td>
                 <td><span className="text-slate-700 block text-xs">{project.ministry}</span><span className="text-2xs text-slate-400">{project.sector}</span></td>
                 <td className="text-xs tabular-nums">{money(project.originalApprovedCost)}</td>
                 <td className="text-xs font-semibold tabular-nums">{money(project.latestRevisedCost)}</td>

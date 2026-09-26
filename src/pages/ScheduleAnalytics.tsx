@@ -11,6 +11,7 @@ import { usePragatiData } from '../context/PragatiDataContext';
 import { useAuth } from '../hooks/useAuth';
 import { ProjectService } from '../services';
 import { SchedulePredictionService } from '../services/schedulePredictionService';
+import { buildMockProjectHistory, buildMockScheduleProjection } from '../services/mockProjectIntelligence';
 import {
   scheduleAnalyticsService,
   type ScheduleAnalyticsResponse,
@@ -99,7 +100,13 @@ export default function ScheduleAnalytics() {
     setSchedulePrediction(null);
     setPredictionHistory(null);
     setPredictionError(null);
-    if (!effectivePredictionProjectId || !USE_BACKEND_DATA || !hasPermission('view_predictions')) return;
+    if (!effectivePredictionProjectId || !hasPermission('view_predictions')) return;
+    if (!USE_BACKEND_DATA) {
+      setSchedulePrediction(buildMockScheduleProjection(effectivePredictionProjectId));
+      setPredictionHistory(buildMockProjectHistory(effectivePredictionProjectId));
+      setPredictionLoading(false);
+      return;
+    }
     const controller = new AbortController();
     setPredictionLoading(true);
     void Promise.all([
@@ -201,7 +208,7 @@ export default function ScheduleAnalytics() {
         <div className="flex-1">
           <p className="font-semibold">Schedule data availability</p>
           <p className="mt-0.5">
-            {availability.comparableDateProjects} of {availability.totalProjects} projects have comparable completion dates; {availability.comparableProgressProjects} have planned and actual progress; {availability.monthlyHistoryProjects} include monthly history.
+            {availability.comparableDateProjects} of {availability.totalProjects} projects have comparable completion dates; {availability.comparableProgressProjects} have planned and actual progress; {availability.monthlyHistoryProjects} include {USE_BACKEND_DATA ? 'monthly history' : 'reconstructed demonstration history'}.
           </p>
           <p className="text-2xs mt-1 opacity-80">
             Milestone reporting: {availability.milestoneReportingProjects} projects · Detailed milestone dates: {availability.milestoneDetailProjects} · Elapsed-duration coverage: {availability.elapsedDurationProjects} · Velocity coverage: {availability.velocityProjects}
@@ -250,7 +257,7 @@ export default function ScheduleAnalytics() {
       </div>
 
       <div className="card">
-        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Planned vs. Actual Historical Progress</h2><p className="text-xs text-slate-500 mt-0.5">Monthly portfolio averages; velocity is actual progress change per calendar month</p></div><Badge variant={availability.monthlyHistoryProjects ? 'info' : 'neutral'}>{availability.monthlyHistoryProjects ? 'Monthly database records' : 'Awaiting monthly records'}</Badge></div>
+        <div className="card-header"><div><h2 className="text-sm font-semibold text-navy-800">Planned vs. Actual Historical Progress</h2><p className="text-xs text-slate-500 mt-0.5">{USE_BACKEND_DATA ? 'Monthly portfolio averages; velocity is actual progress change per calendar month' : 'Deterministically reconstructed synthetic portfolio progress; not imported CUF history'}</p></div><Badge variant={availability.monthlyHistoryProjects ? 'info' : 'neutral'}>{availability.monthlyHistoryProjects ? (USE_BACKEND_DATA ? 'Monthly database records' : 'Synthetic demo history') : 'Awaiting monthly records'}</Badge></div>
         <div className="card-body">
           {trend.length ? <ResponsiveContainer width="100%" height={290}>
             <LineChart data={trend} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
@@ -270,8 +277,8 @@ export default function ScheduleAnalytics() {
         <div className="card">
           <div className="card-header flex-wrap gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-navy-800">Project Schedule ML Forecast</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Independent completion-delay model; actual, planned, and predicted values remain visually distinct.</p>
+              <h2 className="text-sm font-semibold text-navy-800">{USE_BACKEND_DATA ? 'Project Schedule ML Forecast' : 'Deterministic Demo Schedule Projection'}</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{USE_BACKEND_DATA ? 'Independent completion-delay model; actual, planned, and predicted values remain visually distinct.' : 'Transparent rule projection from the selected synthetic project snapshot; no trained model or probability is implied.'}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <select
@@ -291,26 +298,24 @@ export default function ScheduleAnalytics() {
             </div>
           </div>
           <div className="card-body space-y-4">
-            {!USE_BACKEND_DATA && (
-              <EmptyState title="Real schedule inference unavailable in mock mode" description="Switch VITE_DATA_SOURCE to backend and register a trained schedule model to use this panel." />
-            )}
-            {USE_BACKEND_DATA && predictionError && (
+            {predictionError && (
               <ErrorState title="Schedule prediction unavailable" description={predictionError} onRetry={hasPermission('analyse_data') ? () => void runSchedulePrediction() : undefined} />
             )}
-            {USE_BACKEND_DATA && predictionLoading && <LoadingState message="Loading the independent schedule model result…" />}
-            {USE_BACKEND_DATA && !predictionLoading && !predictionError && !schedulePrediction && (
+            {predictionLoading && <LoadingState message="Loading the schedule projection…" />}
+            {!predictionLoading && !predictionError && !schedulePrediction && (
               <EmptyState
-                title="No persisted schedule prediction"
-                description={hasPermission('analyse_data') ? 'Run the active trained model for the selected project.' : 'An Administrator or Analyst must generate this prediction.'}
+                title="No schedule projection available"
+                description={USE_BACKEND_DATA ? (hasPermission('analyse_data') ? 'Run the active trained model for the selected project.' : 'An Administrator or Analyst must generate this prediction.') : 'The selected demonstration project does not contain the fields required for a deterministic projection.'}
               />
             )}
-            {USE_BACKEND_DATA && schedulePrediction && !predictionLoading && (
+            {schedulePrediction && !predictionLoading && (
               <>
+                {schedulePrediction.synthetic && <div className="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-900"><strong>Synthetic demonstration projection:</strong> calculated deterministically from demo progress, delay, and milestone fields. It is not a trained ML inference or an official forecast.</div>}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">Overrun probability</span><span className="text-lg font-bold text-navy-900">{schedulePrediction.scheduleOverrunProbability == null ? 'Not trained' : `${(schedulePrediction.scheduleOverrunProbability * 100).toFixed(1)}%`}</span></div>
-                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">Expected delay</span><span className={`text-lg font-bold ${schedulePrediction.expectedDelayDays > 0 ? 'text-red-700' : 'text-green-700'}`}>{schedulePrediction.expectedDelayDays.toLocaleString()} days</span></div>
-                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">Predicted completion</span><span className="text-sm font-bold text-navy-900">{dateLabel(schedulePrediction.predictedCompletionDate)}</span></div>
-                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">Empirical range</span><span className="text-xs font-bold text-navy-900">{dateLabel(schedulePrediction.predictedCompletionDateLower)} – {dateLabel(schedulePrediction.predictedCompletionDateUpper)}</span></div>
+                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">{schedulePrediction.synthetic ? 'Estimated delay' : 'Expected delay'}</span><span className={`text-lg font-bold ${schedulePrediction.expectedDelayDays > 0 ? 'text-red-700' : 'text-green-700'}`}>{schedulePrediction.expectedDelayDays.toLocaleString()} days</span></div>
+                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">{schedulePrediction.synthetic ? 'Estimated completion' : 'Predicted completion'}</span><span className="text-sm font-bold text-navy-900">{dateLabel(schedulePrediction.predictedCompletionDate)}</span></div>
+                  <div className="p-3 bg-slate-50 border rounded"><span className="text-2xs text-slate-500 block">Sensitivity range</span><span className="text-xs font-bold text-navy-900">{dateLabel(schedulePrediction.predictedCompletionDateLower)} – {dateLabel(schedulePrediction.predictedCompletionDateUpper)}</span></div>
                 </div>
                 <ResponsiveContainer width="100%" height={290}>
                   <LineChart data={projectPredictionTrend} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
@@ -321,11 +326,13 @@ export default function ScheduleAnalytics() {
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Line type="monotone" dataKey="planned" name="Reported planned" stroke="#64748b" strokeWidth={2} strokeDasharray="5 4" connectNulls={false} />
                     <Line type="monotone" dataKey="actual" name="Observed actual" stroke="#176b78" strokeWidth={2.5} connectNulls={false} />
-                    <Line type="monotone" dataKey="predicted" name="Predicted/implied path" stroke="#8b5cf6" strokeWidth={2.5} strokeDasharray="7 4" connectNulls={true} />
+                    <Line type="monotone" dataKey="predicted" name={schedulePrediction.synthetic ? 'Estimated demo path' : 'Predicted/implied path'} stroke="#8b5cf6" strokeWidth={2.5} strokeDasharray="7 4" connectNulls={true} />
                   </LineChart>
                 </ResponsiveContainer>
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded text-2xs text-amber-800">
-                  Purple values are not actual reports. They are linear interpolation to model version {schedulePrediction.modelVersion}'s predicted completion date, not a separately trained monthly-progress forecast. The date range uses held-out validation error and is not formally calibrated.
+                  {schedulePrediction.synthetic
+                    ? `Purple values are deterministic synthetic estimates, not actual reports or ML output. They interpolate to ${schedulePrediction.modelVersion}'s estimated completion and use an uncalibrated sensitivity band.`
+                    : `Purple values are not actual reports. They are linear interpolation to model version ${schedulePrediction.modelVersion}'s predicted completion date, not a separately trained monthly-progress forecast. The date range uses held-out validation error and is not formally calibrated.`}
                 </div>
               </>
             )}
@@ -391,7 +398,7 @@ export default function ScheduleAnalytics() {
 
       <div className="p-4 bg-slate-50 border border-slate-200 rounded text-2xs text-slate-600 flex gap-2">
         <Calendar className="w-4 h-4 shrink-0 text-slate-500" />
-        <p><strong>Calculation basis:</strong> portfolio slippage, progress variance, elapsed duration, velocity, and overdue milestones remain deterministic database analytics. The separately labelled Project Schedule ML Forecast uses its own versioned model; purple chart values are predictions and never replace reported actuals.</p>
+        <p><strong>Calculation basis:</strong> {USE_BACKEND_DATA ? 'portfolio slippage, progress variance, elapsed duration, velocity, and overdue milestones remain deterministic database analytics. The separately labelled Project Schedule ML Forecast uses its own versioned model; purple chart values are predictions and never replace reported actuals.' : 'portfolio slippage, progress variance, elapsed duration, velocity, and overdue milestones are calculated from synthetic demo fixtures. Historical and purple projection series are reconstructed demonstrations and do not replace imported CUF records or trained model results.'}</p>
       </div>
     </div>
   );

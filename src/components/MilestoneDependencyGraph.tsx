@@ -12,6 +12,7 @@ import {
   type DependencyNode,
   type DependencyType,
 } from '../services/dependencyService';
+import { buildMockDependencyGraph } from '../services/mockProjectIntelligence';
 
 interface Props {
   projectId: string;
@@ -140,11 +141,12 @@ export function MilestoneDependencyGraph({ projectId, backendEnabled, canManage 
   const [mutationError, setMutationError] = useState<string | null>(null);
 
   const load = useCallback(async (signal?: AbortSignal) => {
-    if (!backendEnabled) return;
     setLoading(true);
     setError(null);
     try {
-      const response = await DependencyService.graph(projectId, signal);
+      const response = backendEnabled
+        ? await DependencyService.graph(projectId, signal)
+        : buildMockDependencyGraph(projectId);
       setGraph(response);
       setUpstream(current => current || response.nodes[0]?.id || '');
       setDownstream(current => current || response.nodes[1]?.id || '');
@@ -203,13 +205,6 @@ export function MilestoneDependencyGraph({ projectId, backendEnabled, canManage 
     }
   };
 
-  if (!backendEnabled) {
-    return (
-      <div className="rounded border border-slate-200 bg-slate-50 p-5">
-        <EmptyState title="Dependency graph requires backend data" description="Explicit dependency edges are not fabricated from offline demo milestone order." />
-      </div>
-    );
-  }
   if (loading && !graph) return <LoadingState message="Loading explicit milestone dependencies..." />;
   if (error && !graph) return <ErrorState description={error} onRetry={() => void load()} />;
   if (!graph) return null;
@@ -285,7 +280,7 @@ export function MilestoneDependencyGraph({ projectId, backendEnabled, canManage 
         </div>
       )}
 
-      {canManage && graph.nodes.length >= 2 && (
+      {canManage && backendEnabled && graph.nodes.length >= 2 && (
         <div className="rounded border border-slate-200 bg-white p-4 space-y-3">
           <div className="flex items-center gap-2"><Link2 className="h-4 w-4 text-navy-700" /><h4 className="text-sm font-semibold text-navy-900">Define explicit dependency</h4></div>
           <p className="text-2xs text-slate-500">Only stored edges are analysed. Cycles, self-dependencies, cross-project references, and duplicates are rejected by the API and database.</p>
@@ -304,11 +299,11 @@ export function MilestoneDependencyGraph({ projectId, backendEnabled, canManage 
       {graph.edges.length > 0 && (
         <div className="overflow-x-auto rounded border border-slate-200">
           <table className="data-table min-w-[850px]">
-            <thead><tr><th>Upstream</th><th>Downstream</th><th>Type</th><th>Lag</th><th>Source</th>{canManage && <th>Action</th>}</tr></thead>
+            <thead><tr><th>Upstream</th><th>Downstream</th><th>Type</th><th>Lag</th><th>Source</th>{canManage && backendEnabled && <th>Action</th>}</tr></thead>
             <tbody>{graph.edges.map(edge => {
               const source = graph.nodes.find(node => node.id === edge.upstreamMilestoneId);
               const target = graph.nodes.find(node => node.id === edge.downstreamMilestoneId);
-              return <tr key={edge.id}><td className="text-xs font-medium text-navy-900">{source?.code} · {source?.name}</td><td className="text-xs font-medium text-navy-900">{target?.code} · {target?.name}</td><td className="text-xs text-slate-600">{TYPE_LABELS[edge.dependencyType]}</td><td className="text-xs text-slate-600">{edge.lagDays} days</td><td><p className="text-xs text-slate-600">{edge.sourceSystem}</p><p className="text-2xs text-slate-400">{edge.sourceReference || 'No reference'}</p></td>{canManage && <td><button className="btn btn-secondary px-2 py-1 text-xs text-red-600" disabled={saving} onClick={() => void removeDependency(edge.id)}><Trash2 className="h-3 w-3" /> Remove</button></td>}</tr>;
+              return <tr key={edge.id}><td className="text-xs font-medium text-navy-900">{source?.code} · {source?.name}</td><td className="text-xs font-medium text-navy-900">{target?.code} · {target?.name}</td><td className="text-xs text-slate-600">{TYPE_LABELS[edge.dependencyType]}</td><td className="text-xs text-slate-600">{edge.lagDays} days</td><td><p className="text-xs text-slate-600">{edge.sourceSystem}</p><p className="text-2xs text-slate-400">{edge.sourceReference || 'No reference'}</p></td>{canManage && backendEnabled && <td><button className="btn btn-secondary px-2 py-1 text-xs text-red-600" disabled={saving} onClick={() => void removeDependency(edge.id)}><Trash2 className="h-3 w-3" /> Remove</button></td>}</tr>;
             })}</tbody>
           </table>
         </div>
