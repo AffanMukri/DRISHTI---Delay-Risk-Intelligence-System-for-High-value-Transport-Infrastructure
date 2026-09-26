@@ -20,6 +20,7 @@ tmp/
 # Python backend
 backend/.venv/
 backend/**/__pycache__/
+api/**/__pycache__/
 backend/.pytest_cache/
 backend/.coverage
 backend/artifacts/
@@ -29,6 +30,7 @@ supabase/.temp/
 .env
 .env.*
 !.env.example
+!.env.demo
 
 # Editor directories and files
 .vscode/*

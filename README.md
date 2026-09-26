@@ -28,27 +28,18 @@ npm install
 npm run dev
 ```
 
-### Local demonstration login
+### Local demonstration data
 
-For an offline frontend demonstration, create `.env.demo.local` from the demo
-variables in `.env.example`, keep `VITE_DATA_SOURCE=mock`, and run:
+For an offline frontend data demonstration, keep `VITE_DATA_SOURCE=mock` and
+run:
 
 ```powershell
 npm run demo
 ```
 
-The local demo account configured in this workspace is:
-
-```text
-Email: admin@drishti.local
-Password: configured in `.env.demo.local`
-```
-
-Demo authentication is accepted only by a Vite development build when both
-`VITE_DEMO_AUTH=true` and `VITE_DATA_SOURCE=mock`. It cannot create a Supabase
-session or authorize FastAPI/PostgreSQL requests and must never be enabled in a
-deployed environment. Use `npm run test:demo-login` while the demo server is
-running to verify the login flow.
+Authentication always uses Supabase, including when the frontend is showing
+the explicit local mock dataset. No dummy users or passwords are implemented
+in the application bundle.
 
 Useful checks:
 
@@ -57,6 +48,13 @@ npm run build
 npm run lint
 npm run test:browser
 ```
+
+## Production deployment
+
+The Vite frontend and FastAPI entry point are prepared for a single Vercel
+project. Follow [docs/vercel-deployment.md](docs/vercel-deployment.md) to apply
+the Supabase migration, bootstrap the initial Administrator without committing
+a password, configure environment variables, deploy, and verify role requests.
 
 Administrators also have a **Model Monitoring** page showing registered model
 versions, training metadata, feature lists, held-out metrics, last inference,

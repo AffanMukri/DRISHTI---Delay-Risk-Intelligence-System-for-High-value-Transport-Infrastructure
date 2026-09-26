@@ -12,7 +12,6 @@
     "test:browser": "node scripts/verify-pages.mjs",
     "test:public-enquiry": "node scripts/verify-public-enquiry.mjs",
     "test:project-intelligence": "node scripts/verify-project-intelligence.mjs",
-    "test:demo-login": "node scripts/verify-demo-login.mjs",
     "test:roles": "node scripts/verify-role-access.mjs",
     "preview": "vite preview"
   },

@@ -1,6 +1,9 @@
 import { chromium } from 'playwright-core';
+import path from 'node:path';
+import { installSupabaseBrowserSession, startMockViteServer } from './supabase-browser-session.mjs';
 
-const origin = 'http://127.0.0.1:5173';
+const root = path.resolve(import.meta.dirname, '..');
+const { origin, server } = await startMockViteServer(root, 4178);
 const browser = await chromium.launch({
   executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   headless: true,
@@ -8,6 +11,7 @@ const browser = await chromium.launch({
 
 try {
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  await installSupabaseBrowserSession(context, root, 'administrator');
   const page = await context.newPage();
   const runtimeErrors = [];
   page.on('pageerror', error => runtimeErrors.push(error.message));
@@ -55,11 +59,6 @@ try {
     throw new Error(`Project fixture coverage failed:\n${fixtureCoverage.failures.join('\n')}`);
   }
 
-  await page.getByRole('button', { name: 'Sign in', exact: true }).first().click();
-  await page.getByLabel('Email address').fill('admin@drishti.local');
-  await page.getByLabel('Assigned access role').selectOption('administrator');
-  await page.getByLabel('Password', { exact: true }).fill('DrishtiAdmin@2026!');
-  await page.getByRole('button', { name: 'Sign In' }).click();
   await page.getByRole('heading', { name: 'Infrastructure Command Center', exact: true }).waitFor();
 
   await page.getByText('Project Portfolio', { exact: true }).last().click();
@@ -101,4 +100,5 @@ try {
   console.log(`Verified all Project Intelligence generators for ${fixtureCoverage.projectCount} projects and exercised every detail tab.`);
 } finally {
   await browser.close();
+  server.kill();
 }

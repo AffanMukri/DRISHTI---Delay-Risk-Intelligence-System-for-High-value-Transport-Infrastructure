@@ -1403,7 +1403,7 @@ def test_public_project_enquiry_requires_no_bearer_and_excludes_internal_fields(
 
 
 def test_openapi_documents_all_requested_paths(client: TestClient) -> None:
-    response = client.get("/openapi.json")
+    response = client.get("/api/openapi.json")
     assert response.status_code == 200
     paths = response.json()["paths"]
     for path in (

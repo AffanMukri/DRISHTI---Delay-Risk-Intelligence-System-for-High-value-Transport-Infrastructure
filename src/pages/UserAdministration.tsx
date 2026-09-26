@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle2, Eye, Loader2, LockKeyhole, RefreshCw, ShieldCheck, UserCog, Users } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, Loader2, LockKeyhole, RefreshCw, ShieldCheck, UserCheck, UserCog, Users, UserX } from 'lucide-react';
 import {
   ROLE_DESCRIPTIONS,
   ROLE_DATA_VISIBILITY,
@@ -9,22 +9,29 @@ import {
 } from '../auth/authorization';
 import { Badge } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
-import { ProfileAdminService } from '../services/profileAdminService';
+import { ProfileAdminService, type AccessRequest } from '../services/profileAdminService';
 
 const APP_ROLES = Object.keys(ROLE_LABELS) as AppRole[];
 
 export default function UserAdministration() {
   const { user, hasPermission } = useAuth();
   const [profiles, setProfiles] = useState<AuthProfile[]>([]);
+  const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const loadProfiles = useCallback(async () => {
+  const loadAccessData = useCallback(async () => {
     setLoading(true);
     setMessage(null);
     try {
-      setProfiles(await ProfileAdminService.list());
+      const [profileRows, requestRows] = await Promise.all([
+        ProfileAdminService.list(),
+        ProfileAdminService.listPendingRequests(),
+      ]);
+      setProfiles(profileRows);
+      setAccessRequests(requestRows);
     } catch {
       setMessage({ type: 'error', text: 'Unable to load user profiles. Verify the authorization migration and your Administrator role.' });
     } finally {
@@ -36,9 +43,12 @@ export default function UserAdministration() {
     if (!hasPermission('administer_users')) return;
 
     let active = true;
-    void ProfileAdminService.list()
-      .then(data => {
-        if (active) setProfiles(data);
+    void Promise.all([ProfileAdminService.list(), ProfileAdminService.listPendingRequests()])
+      .then(([profileRows, requestRows]) => {
+        if (active) {
+          setProfiles(profileRows);
+          setAccessRequests(requestRows);
+        }
       })
       .catch(() => {
         if (active) {
@@ -71,6 +81,28 @@ export default function UserAdministration() {
     }
   };
 
+  const reviewRequest = async (request: AccessRequest, approve: boolean) => {
+    setReviewingId(request.id);
+    setMessage(null);
+    try {
+      await ProfileAdminService.reviewAccessRequest(request.id, approve, request.requestedRole);
+      setAccessRequests(current => current.filter(item => item.id !== request.id));
+      if (approve) {
+        setProfiles(current => current.map(profile => profile.id === request.requesterId
+          ? { ...profile, role: request.requestedRole }
+          : profile));
+      }
+      setMessage({
+        type: 'success',
+        text: `${ROLE_LABELS[request.requestedRole]} access ${approve ? 'approved' : 'rejected'} for ${request.requesterEmail}.`,
+      });
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Unable to review the access request.' });
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -83,7 +115,7 @@ export default function UserAdministration() {
             Assign one of four controlled roles, suspend access, and review each role's data boundary.
           </p>
         </div>
-        <button onClick={() => void loadProfiles()} disabled={loading} className="btn btn-secondary text-xs">
+        <button onClick={() => void loadAccessData()} disabled={loading} className="btn btn-secondary text-xs">
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
@@ -133,6 +165,53 @@ export default function UserAdministration() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="card overflow-hidden">
+        <div className="card-header">
+          <div className="flex items-center gap-2">
+            <UserCheck className="w-4 h-4 text-indigo-700" />
+            <h2 className="text-sm font-semibold text-navy-800">Pending Access Requests</h2>
+          </div>
+          <Badge variant={accessRequests.length ? 'watch' : 'healthy'}>
+            {accessRequests.length} pending
+          </Badge>
+        </div>
+        {loading ? (
+          <div className="p-8 flex items-center justify-center gap-2 text-sm text-slate-500">
+            <Loader2 className="w-4 h-4 animate-spin" /> Loading requests...
+          </div>
+        ) : accessRequests.length === 0 ? (
+          <div className="p-8 text-center">
+            <ShieldCheck className="w-7 h-7 mx-auto text-emerald-500" />
+            <p className="mt-2 text-sm font-medium text-slate-700">No elevated-access requests are waiting for review.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="data-table min-w-[850px]">
+              <thead><tr><th>Requester</th><th>Requested role</th><th>Reason</th><th>Submitted</th><th>Decision</th></tr></thead>
+              <tbody>
+                {accessRequests.map(request => {
+                  const reviewing = reviewingId === request.id;
+                  return (
+                    <tr key={request.id}>
+                      <td><p className="text-xs font-semibold text-navy-900">{request.requesterName || 'Unnamed user'}</p><p className="text-2xs text-slate-500">{request.requesterEmail}</p></td>
+                      <td><Badge variant={request.requestedRole === 'administrator' ? 'critical' : request.requestedRole === 'executive' ? 'watch' : 'info'}>{ROLE_LABELS[request.requestedRole]}</Badge></td>
+                      <td className="max-w-sm text-xs text-slate-600">{request.reason || 'No reason supplied.'}</td>
+                      <td className="text-xs text-slate-500">{new Date(request.createdAt).toLocaleDateString('en-IN')}</td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <button type="button" disabled={reviewing} onClick={() => void reviewRequest(request, true)} className="btn btn-primary btn-sm"><UserCheck className="w-3.5 h-3.5" /> Approve</button>
+                          <button type="button" disabled={reviewing} onClick={() => void reviewRequest(request, false)} className="btn btn-secondary btn-sm text-red-700"><UserX className="w-3.5 h-3.5" /> Reject</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="card overflow-hidden">

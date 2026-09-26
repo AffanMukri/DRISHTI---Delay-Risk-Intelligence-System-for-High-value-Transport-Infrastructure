@@ -52,9 +52,9 @@ Set `BACKEND_RELOAD=true` in `.env` for local auto-reload. The project launcher 
 Useful URLs:
 
 - Health: `http://127.0.0.1:8000/api/health`
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- ReDoc: `http://127.0.0.1:8000/redoc`
-- OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
+- Swagger UI: `http://127.0.0.1:8000/api/docs`
+- ReDoc: `http://127.0.0.1:8000/api/redoc`
+- OpenAPI JSON: `http://127.0.0.1:8000/api/openapi.json`
 
 ## Administrative audit trail
 

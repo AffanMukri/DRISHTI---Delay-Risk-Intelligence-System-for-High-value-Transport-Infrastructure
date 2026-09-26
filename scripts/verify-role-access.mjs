@@ -1,23 +1,28 @@
 import { chromium } from 'playwright-core';
+import path from 'node:path';
+import { installSupabaseBrowserSession, startMockViteServer } from './supabase-browser-session.mjs';
+
+const root = path.resolve(import.meta.dirname, '..');
+const { origin, server } = await startMockViteServer(root, 4177);
 
 const accounts = [
   {
-    email: 'admin@drishti.local', password: 'DrishtiAdmin@2026!', role: 'administrator', label: 'Administrator',
+    role: 'administrator', label: 'Administrator',
     visibleGroups: ['Administration', 'Insights & Models', 'Operations', 'Risk & Action'], hiddenGroups: [],
     group: 'Administration', visibleItem: 'Master Access Portal', hiddenItem: null,
   },
   {
-    email: 'executive@drishti.local', password: 'DrishtiExec@2026!', role: 'executive', label: 'Executive',
+    role: 'executive', label: 'Executive',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations', 'Insights & Models'], hiddenGroups: ['Administration'],
     group: 'Operations', visibleItem: 'Reports', hiddenItem: 'Data Management',
   },
   {
-    email: 'officer@drishti.local', password: 'DrishtiOfficer@2026!', role: 'monitoring_officer', label: 'Monitoring Officer',
+    role: 'monitoring_officer', label: 'Monitoring Officer',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations'], hiddenGroups: ['Administration', 'Insights & Models'],
     group: 'Operations', visibleItem: 'Data Management', hiddenItem: null,
   },
   {
-    email: 'analyst@drishti.local', password: 'DrishtiAnalyst@2026!', role: 'analyst', label: 'Analyst',
+    role: 'analyst', label: 'Analyst',
     visibleGroups: ['Risk & Action', 'Analytics', 'Operations', 'Insights & Models'], hiddenGroups: ['Administration'],
     group: 'Risk & Action', visibleItem: 'Risk Intelligence', hiddenItem: 'Intervention Center',
   },
@@ -28,21 +33,12 @@ const browser = await chromium.launch({
   headless: true,
 });
 
-async function openLogin(page) {
-  await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: 'Sign in', exact: true }).first().click();
-  await page.getByLabel('Email address').waitFor({ state: 'visible' });
-}
-
 try {
-  for (const account of accounts) {
+  for (const [index, account] of accounts.entries()) {
     const context = await browser.newContext();
+    await installSupabaseBrowserSession(context, root, account.role, index + 1);
     const page = await context.newPage();
-    await openLogin(page);
-    await page.getByLabel('Email address').fill(account.email);
-    await page.getByLabel('Assigned access role').selectOption(account.role);
-    await page.getByLabel('Password', { exact: true }).fill(account.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.goto(origin, { waitUntil: 'networkidle' });
     await page.getByRole('heading', { name: 'Infrastructure Command Center', exact: true }).waitFor();
     await page.getByText(account.label, { exact: true }).last().waitFor();
 
@@ -62,17 +58,8 @@ try {
     await context.close();
   }
 
-  const mismatchContext = await browser.newContext();
-  const mismatchPage = await mismatchContext.newPage();
-  await openLogin(mismatchPage);
-  await mismatchPage.getByLabel('Email address').fill('admin@drishti.local');
-  await mismatchPage.getByLabel('Assigned access role').selectOption('executive');
-  await mismatchPage.getByLabel('Password', { exact: true }).fill('DrishtiAdmin@2026!');
-  await mismatchPage.getByRole('button', { name: 'Sign In' }).click();
-  await mismatchPage.getByText('The selected role does not match the role assigned to this account.', { exact: true }).waitFor();
-  await mismatchContext.close();
-
-  console.log('All four demo roles and role-mismatch protection verified.');
+  console.log('All four Supabase profile roles and route visibility rules verified.');
 } finally {
   await browser.close();
+  server.kill();
 }

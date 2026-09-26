@@ -40,6 +40,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('executive');
+  const [requestReason, setRequestReason] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -51,9 +52,9 @@ export default function AuthPage({ onBack }: AuthPageProps) {
     clearAuthMessage();
     setErrorMessage(null);
     setSuccessMessage(null);
-    clearAuthMessage();
     setPassword('');
     setConfirmPassword('');
+    setRequestReason('');
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -82,12 +83,16 @@ export default function AuthPage({ onBack }: AuthPageProps) {
           email.trim(),
           password,
           fullName,
+          selectedRole,
+          requestReason,
         );
 
         if (error) {
           setErrorMessage(formatAuthError(error, mode));
         } else if (requiresEmailConfirmation) {
-          setSuccessMessage('Account created. Check your email to confirm your account, then sign in.');
+          setSuccessMessage(selectedRole === 'executive'
+            ? 'Account created with Executive access. Check your email to confirm your account, then sign in.'
+            : `Account created with Executive access. Your ${ROLE_LABELS[selectedRole]} request was sent to the Administrator for review.`);
           setPassword('');
           setConfirmPassword('');
         }
@@ -251,9 +256,8 @@ export default function AuthPage({ onBack }: AuthPageProps) {
                 </div>
               </div>
 
-              {mode === 'login' && (
-                <div>
-                  <label htmlFor="access-role" className="block text-xs font-semibold text-slate-600 mb-1.5">Assigned access role</label>
+              <div>
+                  <label htmlFor="access-role" className="block text-xs font-semibold text-slate-600 mb-1.5">{mode === 'login' ? 'Assigned access role' : 'Requested access role'}</label>
                   <div className="relative">
                     <UserRoundCog className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <select
@@ -269,8 +273,27 @@ export default function AuthPage({ onBack }: AuthPageProps) {
                     </select>
                   </div>
                   <p className="mt-1.5 text-[10px] leading-relaxed text-slate-400">
-                    {ROLE_DESCRIPTIONS[selectedRole]}. Your stored profile must match this selection.
+                    {mode === 'login'
+                      ? `${ROLE_DESCRIPTIONS[selectedRole]}. Your stored profile must match this selection.`
+                      : selectedRole === 'executive'
+                        ? 'Executive is the default role applied by the database after email registration.'
+                        : `${ROLE_DESCRIPTIONS[selectedRole]}. This is a request only; the Administrator must approve it.`}
                   </p>
+                </div>
+
+              {mode === 'signup' && selectedRole !== 'executive' && (
+                <div>
+                  <label htmlFor="access-request-reason" className="block text-xs font-semibold text-slate-600 mb-1.5">Reason for elevated access</label>
+                  <textarea
+                    id="access-request-reason"
+                    required
+                    maxLength={1000}
+                    rows={3}
+                    value={requestReason}
+                    onChange={event => setRequestReason(event.target.value)}
+                    className="input min-h-20 py-2 resize-y"
+                    placeholder="Describe your designation and why this role is required."
+                  />
                 </div>
               )}
 
@@ -332,7 +355,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
 
             <p className="text-2xs text-slate-400 text-center mt-6 leading-relaxed">
               {mode === 'signup'
-                ? 'New accounts receive Executive access until an administrator assigns another role.'
+                ? 'All accounts are created by Supabase. Elevated roles remain pending until approved by the Administrator.'
                 : 'By continuing, you acknowledge that access is restricted to authorized users and may be audited.'}
             </p>
           </div>

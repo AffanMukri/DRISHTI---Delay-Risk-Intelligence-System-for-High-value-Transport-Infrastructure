@@ -1,6 +1,6 @@
-# PRAGATI-X Supabase database
+# DRISHTI Supabase database
 
-This directory contains the normalized PostgreSQL foundation for PRAGATI-X. The
+This directory contains the normalized PostgreSQL foundation for DRISHTI. The
 existing React application consumes the FastAPI service adapter while retaining
 an explicit mock adapter for offline development.
 
@@ -33,6 +33,10 @@ preserved as unique external codes:
   database triggers for project, warning, model, prediction, and risk changes.
 - `migrations/20260921000600_milestone_dependencies.sql`: explicit milestone/
   package dependency edges, cycle prevention, RLS, indexes, and audited writes.
+- `migrations/20260926000100_access_requests.sql`: Supabase-only signup,
+  Executive-by-default provisioning, and audited Administrator-reviewed role requests.
+- `bootstrap-initial-admin.sql`: one-time, password-free initial Administrator
+  bootstrap after the auth user is created in the Supabase Dashboard.
 - `seed.sql`: generated synthetic data matching the current frontend fixtures.
 - `tests/database/database_foundation_test.sql`: pgTAP structure, RLS, and seed
   assertions.
@@ -93,8 +97,8 @@ Do not use `--include-seed` against a production database.
 
 - Signed-out (`anon`) clients have no table access.
 - Authenticated users can read portfolio data.
-- New signups receive the `executive` profile role; they cannot choose or
-  elevate their own role.
+- New signups receive the `executive` profile role. A requested elevated role
+  creates a pending `access_requests` row and never grants access by itself.
 - `executive` can read predictions/interventions and create interventions.
 - `monitoring_officer` can upload, validate, and confirm CUF monitoring updates
   and interventions.
@@ -110,9 +114,9 @@ Do not use `--include-seed` against a production database.
   edges; Executives and other active roles can view dependency propagation.
   Edges must join nodes from the same project and cannot form cycles.
 - Notifications are visible/updateable by their recipient and administrators.
-- Promote the first administrator through the Dashboard SQL editor or a
-  service-role-only administrative backend; never accept role elevation from
-  browser user metadata.
+- Bootstrap the first Administrator with `bootstrap-initial-admin.sql`. Later
+  role requests are reviewed in the Master Access Portal; browser metadata is
+  only a request and is never authorization.
 
 Frontend route/action checks mirror these permissions for usability, but the
 PostgreSQL grants and RLS policies in
@@ -140,7 +144,7 @@ where lower(email) = lower('analyst-test@example.invalid');
 ```
 
 The first Administrator must be bootstrapped in the Dashboard SQL editor. All
-later role/status changes can be made from PRAGATI-X **User Administration** and
+later role/status changes can be made from DRISHTI **Master Access Portal** and
 are written to `audit_logs`. The UI intentionally prevents an Administrator
 from demoting or disabling their own account.
 
