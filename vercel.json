@@ -3,10 +3,10 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/index.py": {
-      "maxDuration": 60,
-      "excludeFiles": "{backend/tests/**,backend/.pytest_cache/**,backend/.venv/**,backend/artifacts/**,scripts/**,supabase/**,docs/**,design-system/**,src/**,public/**,dist/**,node_modules/**,output/**,outputs/**,tmp/**}"
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  }
+  ]
 }
