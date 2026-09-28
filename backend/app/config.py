@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     backend_host: str = "127.0.0.1"
     backend_port: int = Field(default=8000, ge=1, le=65535)
     backend_reload: bool = False
+    # The Vercel function intentionally excludes native scientific/document
+    # dependencies that would exceed the platform's 500 MB function limit.
+    # Full local/container deployments keep every API module enabled.
+    serverless_core_runtime: bool = False
 
     database_url: str | None = Field(default=None, repr=False)
     db_pool_size: int = Field(default=5, ge=1, le=50)

@@ -101,6 +101,17 @@ ML artifacts and uploaded RAG documents that must survive deployments should
 later move to durable object storage. Ollama is deliberately disabled because a
 local Ollama daemon is not available inside a Vercel Function.
 
+The `api/index.py` entry point enables the compact serverless runtime. It keeps
+health, public enquiry, projects, portfolio, deterministic analytics,
+benchmarking, risks, warnings, interventions, audit, evidence, dependencies,
+and CUF ingestion within Vercel's 500 MB uncompressed function limit. Native
+scientific and document-rendering packages are intentionally absent from the
+root `uv.lock`; ML prediction/experiments/monitoring, document RAG, and rendered
+report endpoints return a structured `503 full_runtime_required` response.
+The full dependency set remains in `backend/requirements.txt` for a persistent
+Python/container deployment. CUF confirmation still performs deterministic
+risk and warning analysis when the ML runtime is unavailable.
+
 ## 6. Deploy and verify
 
 Click **Deploy**, then verify:
@@ -117,7 +128,7 @@ or Monitoring Officer. Confirm that the account initially has Executive access,
 that its request appears as Pending, and that its role changes only after
 Administrator approval.
 
-If the Python function exceeds Vercel's bundle limit because of scientific/ML
-libraries, keep the Vite frontend on Vercel and deploy `backend/` on a Python
-container host. Then set `VITE_API_BASE_URL` to that HTTPS backend `/api` URL and
-set backend `CORS_ORIGINS` to the Vercel frontend domain.
+To enable ML inference, SHAP, model monitoring, PDF/RAG ingestion, and generated
+reports in production, deploy `backend/` on a persistent Python container host
+using `backend/requirements.txt`. Then set `VITE_API_BASE_URL` to that HTTPS
+backend `/api` URL and set backend `CORS_ORIGINS` to the Vercel frontend domain.

@@ -20,22 +20,15 @@ from app.repositories.risks import RiskRepository
 from app.repositories.warnings import WarningRepository
 from app.services.analytics import AnalyticsService
 from app.services.audit import AuditService
-from app.services.assistant import AssistantDocumentService, AssistantService
 from app.services.cuf import CUFService
 from app.services.dependencies import DependencyService
 from app.services.evidence import EvidenceService
-from app.services.experiments import ExperimentService
 from app.services.health import HealthService
 from app.services.interventions import InterventionService
-from app.services.model_monitoring import ModelMonitoringService
 from app.services.portfolio import PortfolioService
-from app.services.predictions import PredictionService
 from app.services.projects import ProjectService
-from app.services.reports import ReportService
 from app.services.risks import RiskService
-from app.services.scenarios import ScenarioService
 from app.services.warnings import WarningService
-from app.workflows.cuf_analysis import run_cuf_analysis_batch
 
 
 def get_health_service() -> HealthService:
@@ -62,14 +55,18 @@ def get_audit_service(session: AsyncSession = Depends(get_db_session)) -> AuditS
     return AuditService(AuditRepository(session))
 
 
-def get_assistant_service(session: AsyncSession = Depends(get_db_session)) -> AssistantService:
+def get_assistant_service(session: AsyncSession = Depends(get_db_session)):
+    from app.services.assistant import AssistantService
+
     settings = get_settings()
     return AssistantService(AssistantRepository(session), AnalyticsRepository(session), settings)
 
 
 def get_assistant_document_service(
     session: AsyncSession = Depends(get_db_session),
-) -> AssistantDocumentService:
+):
+    from app.services.assistant import AssistantDocumentService
+
     settings = get_settings()
     return AssistantDocumentService(AssistantRepository(session), settings)
 
@@ -86,11 +83,15 @@ def get_intervention_service(session: AsyncSession = Depends(get_db_session)) ->
     return InterventionService(InterventionRepository(session))
 
 
-def get_prediction_service(session: AsyncSession = Depends(get_db_session)) -> PredictionService:
+def get_prediction_service(session: AsyncSession = Depends(get_db_session)):
+    from app.services.predictions import PredictionService
+
     return PredictionService(PredictionRepository(session))
 
 
-def get_scenario_service(session: AsyncSession = Depends(get_db_session)) -> ScenarioService:
+def get_scenario_service(session: AsyncSession = Depends(get_db_session)):
+    from app.services.scenarios import ScenarioService
+
     return ScenarioService(PredictionRepository(session), RiskRepository(session), get_settings())
 
 
@@ -106,19 +107,27 @@ def get_evidence_service(session: AsyncSession = Depends(get_db_session)) -> Evi
     return EvidenceService(EvidenceRepository(session))
 
 
-def get_experiment_service(session: AsyncSession = Depends(get_db_session)) -> ExperimentService:
+def get_experiment_service(session: AsyncSession = Depends(get_db_session)):
+    from app.services.experiments import ExperimentService
+
     return ExperimentService(ExperimentRepository(session), PredictionRepository(session), get_settings())
 
 
 def get_model_monitoring_service(
     session: AsyncSession = Depends(get_db_session),
-) -> ModelMonitoringService:
+):
+    from app.services.model_monitoring import ModelMonitoringService
+
     return ModelMonitoringService(ModelMonitoringRepository(session), get_settings())
 
 
-def get_report_service(session: AsyncSession = Depends(get_db_session)) -> ReportService:
+def get_report_service(session: AsyncSession = Depends(get_db_session)):
+    from app.services.reports import ReportService
+
     return ReportService(ReportRepository(session))
 
 
 def get_cuf_analysis_runner():
+    from app.workflows.cuf_analysis import run_cuf_analysis_batch
+
     return run_cuf_analysis_batch

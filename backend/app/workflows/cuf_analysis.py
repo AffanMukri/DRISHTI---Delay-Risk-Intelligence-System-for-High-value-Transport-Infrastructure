@@ -8,10 +8,8 @@ from app.config import get_settings
 from app.database import get_session_factory
 from app.errors import AppError
 from app.repositories.cuf import CUFRepository
-from app.repositories.predictions import PredictionRepository
 from app.repositories.risks import RiskRepository
 from app.repositories.warnings import WarningRepository
-from app.services.predictions import PredictionService
 from app.services.risks import RiskService
 from app.services.warning_automation import WarningAutomationService
 from sqlalchemy import text
@@ -43,31 +41,54 @@ async def run_cuf_analysis_batch(batch_id: UUID) -> None:
                 await session.execute(text("select set_config('app.import_reference', :batch_id, true)"), {"batch_id": str(batch_id)})
                 cuf_repository = CUFRepository(session)
                 projects = await cuf_repository.imported_projects(batch_id)
-                prediction_service = PredictionService(PredictionRepository(session))
+                prediction_service = None
+                prediction_runtime_error: str | None = None
+                try:
+                    from app.repositories.predictions import PredictionRepository
+                    from app.services.predictions import PredictionService
+
+                    prediction_service = PredictionService(PredictionRepository(session))
+                except ImportError as exc:
+                    # The compact Vercel runtime deliberately excludes the
+                    # native ML stack. Imports still trigger deterministic
+                    # risk assessment and warning evaluation below.
+                    prediction_runtime_error = str(exc)
                 risk_service = RiskService(RiskRepository(session), get_settings())
                 warning_service = WarningAutomationService(WarningRepository(session), get_settings())
                 results: list[dict[str, Any]] = []
 
                 for project_id in projects:
                     project_result: dict[str, Any] = {"project_id": project_id, "predictions": {}}
-                    for prediction_type, operation in (
-                        ("cost", prediction_service.predict_cost_overrun),
-                        ("schedule", prediction_service.predict_schedule_overrun),
-                    ):
-                        try:
-                            output = await operation(project_id)
-                            project_result["predictions"][prediction_type] = {
-                                "status": "generated",
-                                "model_version": output.get("model_version"),
-                            }
-                        except AppError as exc:
-                            # Deterministic risk and warning evaluation must still run when
-                            # a model is not trained or the project lacks eligible features.
+                    if prediction_service is None:
+                        for prediction_type in ("cost", "schedule"):
                             project_result["predictions"][prediction_type] = {
                                 "status": "unavailable",
-                                "code": exc.code,
-                                "message": exc.message,
+                                "code": "ml_runtime_unavailable",
+                                "message": "ML inference requires the full backend runtime.",
                             }
+                        logger.info(
+                            "ML inference skipped in compact runtime",
+                            extra={"batch_id": str(batch_id), "reason": prediction_runtime_error},
+                        )
+                    else:
+                        for prediction_type, operation in (
+                            ("cost", prediction_service.predict_cost_overrun),
+                            ("schedule", prediction_service.predict_schedule_overrun),
+                        ):
+                            try:
+                                output = await operation(project_id)
+                                project_result["predictions"][prediction_type] = {
+                                    "status": "generated",
+                                    "model_version": output.get("model_version"),
+                                }
+                            except AppError as exc:
+                                # Deterministic risk and warning evaluation must still run when
+                                # a model is not trained or the project lacks eligible features.
+                                project_result["predictions"][prediction_type] = {
+                                    "status": "unavailable",
+                                    "code": exc.code,
+                                    "message": exc.message,
+                                }
 
                     risk = await risk_service.assess_project(project_id)
                     project_result["risk"] = {
