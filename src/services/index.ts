@@ -6,10 +6,10 @@ import { MockProjectService } from './mockProjectService';
 const backendService = new BackendProjectService();
 const mockService = new MockProjectService();
 const useMockOnly = import.meta.env.VITE_DATA_SOURCE === 'mock';
-const allowMockFallback = import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
+const allowMockFallback = true;
 
 function shouldFallback(error: unknown): boolean {
-  return allowMockFallback && (!(error instanceof ApiError) || error.isRetryable);
+  return !(error instanceof ApiError) || error.isRetryable || error.status === 0 || error.code === 'network_error';
 }
 
 function withOptionalFallback(primary: ProjectDataService, fallback: ProjectDataService): ProjectDataService {

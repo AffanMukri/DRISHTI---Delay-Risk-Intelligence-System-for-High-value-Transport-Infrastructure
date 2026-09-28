@@ -1,0 +1,17 @@
+.git
+.github
+.vscode
+node_modules
+backend/.venv
+backend/**/.venv
+backend/.pytest_cache
+backend/tests
+backend/artifacts
+scripts
+supabase
+docs
+design-system
+*.log
+*.sqlite
+*.pyc
+__pycache__

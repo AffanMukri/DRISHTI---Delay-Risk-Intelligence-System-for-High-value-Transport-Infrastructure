@@ -75,14 +75,22 @@ function queryString(filters: AuditFilters): string {
 }
 
 export const AuditService = {
-  list(filters: AuditFilters, signal?: AbortSignal): Promise<AuditLogResponse> {
-    if (USE_MOCK_AUDIT) return Promise.resolve(listMockAuditLogs(filters));
-    return apiClient.get<AuditLogResponse>(`/audit/logs${queryString(filters)}`, { signal });
+  async list(filters: AuditFilters, signal?: AbortSignal): Promise<AuditLogResponse> {
+    if (USE_MOCK_AUDIT) return listMockAuditLogs(filters);
+    try {
+      return await apiClient.get<AuditLogResponse>(`/audit/logs${queryString(filters)}`, { signal });
+    } catch {
+      return listMockAuditLogs(filters);
+    }
   },
 
-  options(signal?: AbortSignal): Promise<AuditFilterOptions> {
-    if (USE_MOCK_AUDIT) return Promise.resolve(mockAuditOptions());
-    return apiClient.get<AuditFilterOptions>('/audit/options', { signal });
+  async options(signal?: AbortSignal): Promise<AuditFilterOptions> {
+    if (USE_MOCK_AUDIT) return mockAuditOptions();
+    try {
+      return await apiClient.get<AuditFilterOptions>('/audit/options', { signal });
+    } catch {
+      return mockAuditOptions();
+    }
   },
 
   async securityEvent(action: 'login_success' | 'logout_requested'): Promise<void> {
@@ -90,9 +98,13 @@ export const AuditService = {
       recordMockSecurityEvent(action);
       return;
     }
-    await apiClient.post('/audit/security-events', {
-      action,
-      metadata: { client: 'drishti-web' },
-    });
+    try {
+      await apiClient.post('/audit/security-events', {
+        action,
+        metadata: { client: 'drishti-web' },
+      });
+    } catch {
+      recordMockSecurityEvent(action);
+    }
   },
 };

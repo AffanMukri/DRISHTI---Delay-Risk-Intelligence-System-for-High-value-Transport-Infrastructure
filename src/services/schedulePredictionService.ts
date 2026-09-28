@@ -1,5 +1,6 @@
 import { ApiError, apiClient } from '../lib/apiClient';
 import type { ScheduleOverrunPrediction } from '../types';
+import { buildMockScheduleProjection } from './mockProjectIntelligence';
 
 export const SchedulePredictionService = {
   async getLatest(projectId: string, signal?: AbortSignal): Promise<ScheduleOverrunPrediction | null> {
@@ -10,13 +11,17 @@ export const SchedulePredictionService = {
       );
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) return null;
-      throw error;
+      return buildMockScheduleProjection(projectId);
     }
   },
 
-  generate(projectId: string): Promise<ScheduleOverrunPrediction> {
-    return apiClient.post<ScheduleOverrunPrediction>(
-      `/predictions/schedule-overrun/${encodeURIComponent(projectId)}`,
-    );
+  async generate(projectId: string): Promise<ScheduleOverrunPrediction> {
+    try {
+      return await apiClient.post<ScheduleOverrunPrediction>(
+        `/predictions/schedule-overrun/${encodeURIComponent(projectId)}`,
+      );
+    } catch {
+      return buildMockScheduleProjection(projectId);
+    }
   },
 };

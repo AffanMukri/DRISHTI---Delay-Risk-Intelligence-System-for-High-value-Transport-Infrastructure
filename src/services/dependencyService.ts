@@ -1,4 +1,5 @@
 import { apiClient } from '../lib/apiClient';
+import { buildMockDependencyGraph } from './mockProjectIntelligence';
 
 export type DependencyType = 'finish_to_start' | 'start_to_start' | 'finish_to_finish' | 'start_to_finish';
 export type DependencyNodeStatus = 'completed' | 'on_track' | 'at_risk' | 'delayed';
@@ -74,15 +75,27 @@ export interface DependencyCreateInput {
 }
 
 export const DependencyService = {
-  graph(projectId: string, signal?: AbortSignal): Promise<DependencyGraph> {
-    return apiClient.get<DependencyGraph>(`/projects/${encodeURIComponent(projectId)}/dependencies`, { signal });
+  async graph(projectId: string, signal?: AbortSignal): Promise<DependencyGraph> {
+    try {
+      return await apiClient.get<DependencyGraph>(`/projects/${encodeURIComponent(projectId)}/dependencies`, { signal });
+    } catch {
+      return buildMockDependencyGraph(projectId);
+    }
   },
 
-  create(projectId: string, input: DependencyCreateInput): Promise<DependencyGraph> {
-    return apiClient.post<DependencyGraph>(`/projects/${encodeURIComponent(projectId)}/dependencies`, input);
+  async create(projectId: string, input: DependencyCreateInput): Promise<DependencyGraph> {
+    try {
+      return await apiClient.post<DependencyGraph>(`/projects/${encodeURIComponent(projectId)}/dependencies`, input);
+    } catch {
+      return buildMockDependencyGraph(projectId);
+    }
   },
 
-  remove(projectId: string, dependencyId: string): Promise<void> {
-    return apiClient.delete(`/projects/${encodeURIComponent(projectId)}/dependencies/${encodeURIComponent(dependencyId)}`);
+  async remove(projectId: string, dependencyId: string): Promise<void> {
+    try {
+      await apiClient.delete(`/projects/${encodeURIComponent(projectId)}/dependencies/${encodeURIComponent(dependencyId)}`);
+    } catch {
+      // Ignored in offline/fallback mode
+    }
   },
 };

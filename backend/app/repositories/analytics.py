@@ -306,22 +306,22 @@ class AnalyticsRepository(BaseRepository):
         """), parameters)
         series_result = await self.session.execute(text("""
             select
-              reporting_month as period,
-              count(distinct project_id)::integer as reporting_projects,
-              count(approved_cost)::integer as approved_cost_projects,
-              count(revised_cost)::integer as revised_cost_projects,
-              count(expenditure)::integer as expenditure_projects,
-              sum(approved_cost)::double precision as original_approved_cost,
-              sum(revised_cost)::double precision as latest_revised_cost,
-              sum(expenditure)::double precision as cumulative_expenditure,
-              sum(revised_cost - approved_cost) filter (
-                where approved_cost is not null and revised_cost is not null
+              update.reporting_month as period,
+              count(distinct update.project_id)::integer as reporting_projects,
+              count(update.approved_cost)::integer as approved_cost_projects,
+              count(update.revised_cost)::integer as revised_cost_projects,
+              count(update.expenditure)::integer as expenditure_projects,
+              sum(update.approved_cost)::double precision as original_approved_cost,
+              sum(update.revised_cost)::double precision as latest_revised_cost,
+              sum(update.expenditure)::double precision as cumulative_expenditure,
+              sum(update.revised_cost - update.approved_cost) filter (
+                where update.approved_cost is not null and update.revised_cost is not null
               )::double precision as absolute_cost_escalation,
               (
-                sum(revised_cost - approved_cost) filter (
-                  where approved_cost is not null and revised_cost is not null
-                ) / nullif(sum(approved_cost) filter (
-                  where approved_cost is not null and revised_cost is not null
+                sum(update.revised_cost - update.approved_cost) filter (
+                  where update.approved_cost is not null and update.revised_cost is not null
+                ) / nullif(sum(update.approved_cost) filter (
+                  where update.approved_cost is not null and update.revised_cost is not null
                 ), 0) * 100
               )::double precision as cost_escalation_percentage
             from public.project_monthly_updates update
@@ -331,8 +331,8 @@ class AnalyticsRepository(BaseRepository):
                 not :escalated_only
                 or (update.approved_cost is not null and update.revised_cost > update.approved_cost)
               )
-            group by reporting_month
-            order by reporting_month
+            group by update.reporting_month
+            order by update.reporting_month
         """), parameters)
 
         aggregate_sql = """

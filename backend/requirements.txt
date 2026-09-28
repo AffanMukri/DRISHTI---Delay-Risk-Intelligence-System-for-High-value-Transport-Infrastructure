@@ -1,5 +1,6 @@
+# Production dependencies for the Vercel Python function.
+# Keep test runners and local-only servers in backend/requirements.txt.
 fastapi>=0.116,<1.0
-uvicorn[standard]>=0.35,<1.0
 pydantic>=2.11,<3.0
 pydantic-settings>=2.10,<3.0
 email-validator>=2.2,<3.0
@@ -12,12 +13,6 @@ numpy>=2.2,<3.0
 scikit-learn>=1.7,<2.0
 scipy>=1.15,<2.0
 joblib>=1.4,<2.0
-# Keep SHAP's compiler stack deterministic and Python 3.12 compatible.
-shap==0.51.0
-numba==0.63.1
-llvmlite==0.46.0
 PyMuPDF>=1.26,<2.0
 reportlab>=4.2,<5.0
 
-# Development and API tests
-pytest>=8.4,<10.0

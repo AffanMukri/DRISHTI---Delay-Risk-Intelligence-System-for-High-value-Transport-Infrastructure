@@ -21,6 +21,7 @@ export interface AuthContextValue {
   hasPermission: (permission: AppPermission) => boolean;
   refreshProfile: () => Promise<void>;
   signIn: (email: string, password: string, requestedRole: AppRole) => Promise<AuthResult>;
+  signInAsRole: (role: AppRole) => Promise<AuthResult>;
   signUp: (
     email: string,
     password: string,
