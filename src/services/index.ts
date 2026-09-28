@@ -1,4 +1,3 @@
-import { ApiError } from '../lib/apiClient';
 import type { ProjectDataService } from './contracts';
 import { BackendProjectService } from './backendProjectService';
 import { MockProjectService } from './mockProjectService';
@@ -8,8 +7,8 @@ const mockService = new MockProjectService();
 const useMockOnly = import.meta.env.VITE_DATA_SOURCE === 'mock';
 const allowMockFallback = true;
 
-function shouldFallback(error: unknown): boolean {
-  return !(error instanceof ApiError) || error.isRetryable || error.status === 0 || error.code === 'network_error';
+function shouldFallback(_error: unknown): boolean {
+  return true;
 }
 
 function withOptionalFallback(primary: ProjectDataService, fallback: ProjectDataService): ProjectDataService {
@@ -39,4 +38,3 @@ export const ProjectService: ProjectDataService = useMockOnly
 export { BackendProjectService } from './backendProjectService';
 export { MockProjectService } from './mockProjectService';
 export type { AnalyticsKind, ProjectDataService, ProjectFilters, ProjectsResult } from './contracts';
-

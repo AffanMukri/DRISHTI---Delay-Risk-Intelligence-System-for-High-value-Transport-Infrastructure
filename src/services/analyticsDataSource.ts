@@ -1,5 +1,3 @@
-import { ApiError } from '../lib/apiClient';
-
 const USE_MOCK_DATA = import.meta.env.VITE_DATA_SOURCE === 'mock';
 const ALLOW_MOCK_FALLBACK = true;
 
@@ -13,8 +11,8 @@ export function analyticsRequest<T>(
 
   const request = backendFactory();
   if (!ALLOW_MOCK_FALLBACK) return request;
-  return request.catch(error => {
-    if (error instanceof ApiError && !error.isRetryable && error.status !== 0 && error.status !== 404) throw error;
+  return request.catch((error) => {
+    console.warn('Backend analytics request failed, using demo intelligence fallback:', error);
     return mockFactory();
   });
 }

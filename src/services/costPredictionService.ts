@@ -1,4 +1,4 @@
-import { ApiError, apiClient } from '../lib/apiClient';
+import { apiClient } from '../lib/apiClient';
 import type { CostOverrunPrediction } from '../types';
 import { buildMockCostProjection } from './mockProjectIntelligence';
 
@@ -9,8 +9,7 @@ export const CostPredictionService = {
         `/predictions/cost-overrun/${encodeURIComponent(projectId)}`,
         { signal },
       );
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 404) return null;
+    } catch {
       return buildMockCostProjection(projectId);
     }
   },

@@ -1,4 +1,4 @@
-import { ApiError, apiClient } from '../lib/apiClient';
+import { apiClient } from '../lib/apiClient';
 import type { ScheduleOverrunPrediction } from '../types';
 import { buildMockScheduleProjection } from './mockProjectIntelligence';
 
@@ -9,8 +9,7 @@ export const SchedulePredictionService = {
         `/predictions/schedule-overrun/${encodeURIComponent(projectId)}`,
         { signal },
       );
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 404) return null;
+    } catch {
       return buildMockScheduleProjection(projectId);
     }
   },
