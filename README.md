@@ -1,6 +1,6 @@
 # DRISHTI
 
-DRISHTI (Delay & Risk Intelligence System for High-value Transport & Infrastructure) is a React 19 + TypeScript + Vite frontend backed by FastAPI and
+DRISHTI (Predictive & Early-Warning Intelligence for Central Sector Infrastructure Projects) is a React 19 + TypeScript + Vite frontend backed by FastAPI and
 Supabase PostgreSQL/Auth. The existing dashboard UI is preserved; data access
 is routed through the typed service layer in `src/services`.
 
